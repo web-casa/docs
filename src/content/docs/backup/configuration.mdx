@@ -1,0 +1,97 @@
+---
+title: Backup Configuration
+description: Set up automated backups with Kopia to local storage, S3, WebDAV, or SFTP targets
+---
+
+Web.Casa uses **Kopia** as its backup engine. All backup data is **password-encrypted** and stored to the target of your choice. This page covers storage setup, scheduling, and retention policies.
+
+## Prerequisites
+
+Kopia CLI must be installed on the server. If it is not already present, Web.Casa can **auto-install it** directly from the panel.
+
+> See the [Kopia Backend](/backup/kopia/) page for details on installation and the underlying engine.
+
+## Storage Targets
+
+Web.Casa supports four storage target types:
+
+| Target | Use Case |
+|--------|----------|
+| **Local Filesystem** | Backup to another disk, partition, or mounted drive on the server |
+| **S3 / MinIO** | Cloud object storage (Amazon S3, MinIO, Backblaze B2, Wasabi, etc.) |
+| **WebDAV** | Network storage via Nextcloud, NAS devices, or any WebDAV server |
+| **SFTP** | Remote server over SSH |
+
+### S3 / MinIO Configuration
+
+- **Endpoint URL** -- S3-compatible API endpoint
+- **Bucket name** -- target bucket
+- **Access key** and **Secret key** -- API credentials
+- **Region** (optional)
+
+### SFTP Configuration
+
+- **Host** and **Port** -- remote server address
+- **Username** -- SSH login user
+- **Authentication** -- password **or** path to SSH private key
+- **Remote path** -- directory on the remote server for backup storage
+
+### WebDAV Configuration
+
+- **URL** -- full WebDAV endpoint
+- **Username** and **Password**
+
+### Local Filesystem Configuration
+
+- **Path** -- absolute directory path on the server
+
+## Encryption
+
+All backup data is encrypted with a **repository password** set during initial configuration.
+
+> **This password is the only way to decrypt your backups.** Store it in a separate, secure location. If lost, backup data cannot be recovered.
+
+## Backup Scopes
+
+Choose what data to include in each backup:
+
+| Scope | What It Backs Up |
+|-------|------------------|
+| **Panel** | Web.Casa database and Caddyfile configuration |
+| **Docker Volumes** | All Docker volumes managed by Web.Casa |
+| **Database Dumps** | SQL dumps from all database instances |
+
+You can enable one or more scopes per backup configuration.
+
+## Scheduling
+
+Backups are scheduled using **cron expressions**. The panel provides presets for common schedules:
+
+| Preset | Cron Expression | Description |
+|--------|----------------|-------------|
+| Daily at 2:00 AM | `0 2 * * *` | Every day at 02:00 |
+| Daily at 4:00 AM | `0 4 * * *` | Every day at 04:00 |
+| Weekly Sunday 3:00 AM | `0 3 * * 0` | Every Sunday at 03:00 |
+
+You can also enter a **custom cron expression** for any other schedule.
+
+## Retention Policy
+
+Control how many snapshots to keep and for how long:
+
+| Setting | Description |
+|---------|-------------|
+| **Keep latest N snapshots** | Always retain the N most recent snapshots |
+| **Keep N days** | Retain snapshots created within the last N days |
+
+> A sensible starting point: keep the **latest 7 snapshots** and retain for **30 days**.
+
+## Status and Monitoring
+
+The backup dashboard displays the current state of each backup configuration:
+
+- **Status** -- `Idle` or `Running`
+- **Last backup** -- timestamp of the most recent completed backup
+- **Next scheduled** -- when the next backup will run
+
+You can trigger a **manual backup** at any time using the **Run Now** button.

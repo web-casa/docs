@@ -1,0 +1,87 @@
+---
+title: Application Store
+description: Install Docker applications with one click from the built-in app catalog
+---
+
+The Application Store lets you **browse, install, and manage Docker applications** with a single click. No manual Compose files or command-line setup required.
+
+## Browsing Apps
+
+The catalog organizes applications by **category** for easy discovery:
+
+- CMS and blogging platforms
+- Development tools
+- Media servers
+- Monitoring and observability
+- Databases and administration tools
+- Communication and collaboration
+- And more
+
+Use the **search bar** to find specific applications by name or keyword.
+
+## Installing an App
+
+1. Browse or search the catalog and select an application
+2. Click **Install**
+3. Configure the installation:
+
+| Setting | Description |
+|---------|-------------|
+| **Instance name** | A unique name to identify this installation |
+| **Domain** (optional) | Assign a domain to the app -- Web.Casa **automatically creates a reverse proxy** |
+| **Auto-update** | Enable automatic image updates when new versions are available |
+| **Environment variables** | Customize app-specific settings (passwords, ports, etc.) |
+
+4. Confirm the installation
+5. Web.Casa pulls the Docker images, creates networks and volumes, and starts the containers
+
+Installation progress is displayed in real time.
+
+> **Warning:** Some applications require **privileged mode** or elevated permissions. The App Store displays a security warning for these apps before installation. Review the permissions carefully before proceeding.
+
+## App Sources
+
+The App Store supports multiple sources for application templates:
+
+- **Official source** -- curated applications maintained by Web.Casa
+- **Custom Git repositories** -- add your own Git repos containing app definitions
+- **Sync** -- manually trigger a sync to fetch the latest app definitions from all sources
+
+### Adding a Custom Source
+
+1. Navigate to App Store settings
+2. Add a Git repository URL
+3. Sync the source to import its applications
+
+## My Apps
+
+The **My Apps** section shows all installed applications and their status.
+
+From this view, you can:
+
+- **Start / Stop / Restart** applications
+- **Update** to the latest image version (data volumes are preserved)
+- **Uninstall** applications (removes containers, networks; data volumes can optionally be kept)
+- View container logs and resource usage
+
+## Project Templates
+
+Beyond Docker apps, the App Store offers **Project Templates** for starting new development projects:
+
+- Pre-built templates for common frameworks and stacks
+- **Framework filter** to narrow by technology (Node.js, Python, Go, PHP, etc.)
+- Templates include recommended project structure, Dockerfile, and deployment configuration
+
+1. Browse templates and select one
+2. Customize the project name and settings
+3. The template is scaffolded as a new project ready for deployment
+
+## Automatic Reverse Proxy
+
+When you provide a **domain** during installation, Web.Casa automatically:
+
+1. Creates a reverse proxy host pointing to the app container
+2. Configures TLS/SSL if applicable
+3. Makes the app accessible at the specified domain
+
+This eliminates the need to manually configure reverse proxy rules after installing an app.

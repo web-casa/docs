@@ -1,0 +1,121 @@
+---
+title: 架构指南
+description: 代码结构、Handler-Service-Model 模式和 Web.Casa 功能开发规范
+---
+
+本指南介绍 Web.Casa 的代码结构和添加新功能的开发规范。
+
+## 项目目录
+
+```
+webcasa/
+├── main.go                  # 应用入口
+├── VERSION                  # 版本号（唯一版本来源）
+├── internal/
+│   ├── config/              # 环境配置加载
+│   ├── model/               # 数据模型和 DTO
+│   ├── database/            # SQLite 初始化和迁移
+│   ├── auth/                # JWT 认证和中间件
+│   ├── caddy/               # Caddy 进程管理 + Caddyfile 渲染
+│   ├── service/             # 业务逻辑层
+│   ├── handler/             # HTTP 请求处理器
+│   └── plugins/             # 功能插件（12 个内置）
+└── web/                     # React 19 前端
+    └── src/
+        └── pages/           # 页面组件
+```
+
+## Handler-Service-Model 模式
+
+这是核心架构规范。所有后端功能遵循**三层模式**：
+
+| 层级 | 位置 | 职责 |
+|------|------|------|
+| **Handler** | `internal/handler/` | 解析 HTTP 请求、验证输入、调用 Service 函数、格式化 JSON 响应 |
+| **Service** | `internal/service/` | 业务逻辑、数据库查询、外部系统交互（Docker API、Caddy Admin API、文件系统） |
+| **Model** | `internal/model/` | 结构体定义、GORM 模型标签、数据库迁移函数 |
+
+这种分层使业务逻辑可以**独立于 HTTP 层进行测试**。
+
+**数据流向：**
+
+```
+HTTP 请求 → Handler（解析 + 验证）→ Service（逻辑）→ Model（数据）→ 数据库
+                                                                      ↓
+HTTP 响应 ← Handler（格式化 JSON）← Service（结果）← Model（查询）← SQLite
+```
+
+## 添加新功能
+
+按以下步骤在后端添加新功能：
+
+1. **在 `internal/model/` 中定义数据模型**
+   - 创建带 GORM 标签的结构体
+   - 在数据库初始化中添加自动迁移
+
+2. **在 `internal/service/` 中实现业务逻辑层**
+   - 编写业务逻辑函数
+   - 通过 GORM 处理数据库操作
+   - 按需与外部系统交互
+
+3. **在 `internal/handler/` 中创建 HTTP 处理器**
+   - 解析请求参数和请求体
+   - 调用 Service 函数
+   - 返回标准化 JSON 响应
+
+4. **在处理器的 `RegisterRoutes()` 函数中注册路由**
+   - 使用适当的 HTTP 方法
+   - 应用认证和 RBAC 中间件
+
+## 路由规范
+
+路由使用 **Gin 路由器**，遵循 REST 规范：
+
+| 方法 | 模式 | 操作 |
+|------|------|------|
+| `GET` | `/api/resources` | 列出全部 |
+| `GET` | `/api/resources/:id` | 获取单个 |
+| `POST` | `/api/resources` | 创建 |
+| `PUT` | `/api/resources/:id` | 更新 |
+| `DELETE` | `/api/resources/:id` | 删除 |
+
+所有响应使用标准化 JSON 封装格式：
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": { }
+}
+```
+
+## ORM 规范
+
+Web.Casa 使用 **GORM** 配合 SQLite（WAL 模式）：
+
+- 模型使用 GORM 结构体标签定义列
+- 自动迁移处理数据库结构更新
+- 使用 GORM 查询构建器进行数据库操作
+- 数据库文件位置：`/var/lib/webcasa/webcasa.db`
+
+## 插件系统
+
+插件位于 `internal/plugins/` 目录下。每个插件实现 **Plugin 接口**：
+
+- **`Init()`** -- 通过 CoreAPI 注册路由、事件处理器和数据库表
+- **`Start()`** -- 启动后台任务
+- **`Stop()`** -- 清理资源
+- **`Info()`** -- 返回插件元数据
+
+详细信息请参阅[插件系统](/zh/plugins/plugin-system/)和[插件开发](/zh/plugins/developing/)。
+
+## 前端规范
+
+`web/src/` 下的 React 前端遵循以下模式：
+
+- **基于功能的目录结构** -- 每个功能有独立目录，包含页面、组件、hooks 和 API 客户端函数
+- **状态管理** -- Zustand 管理全局状态，React hooks 管理局部状态
+- **UI 组件** -- Radix UI Themes 3 保证设计一致性
+- **样式** -- Tailwind CSS v4 原子化类
+- **路由** -- 客户端路由，路由定义在路由器配置中
+- **导航** -- 侧边栏条目在布局配置中定义

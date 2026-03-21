@@ -1,0 +1,81 @@
+---
+title: System Requirements
+description: Minimum system requirements and prerequisites for running Web.Casa
+---
+
+Web.Casa runs on Linux servers with **systemd**. Review the requirements below before installing.
+
+> Windows and macOS are not supported as production deployment targets.
+
+## Supported Operating Systems
+
+Web.Casa supports **EL9/EL10** (RHEL-based) distributions only. Debian-based systems (Ubuntu, Debian) are **not supported**.
+
+| Distribution | Minimum Version |
+|-------------|----------------|
+| **RHEL** | 9+ |
+| **AlmaLinux** | 9+ |
+| **Rocky Linux** | 9+ |
+| **CentOS Stream** | 9+ |
+| **Oracle Linux** | 9+ |
+| **Fedora** | 38+ |
+| **openAnolis** | 9+ |
+| **Alibaba Cloud Linux** | 3+ |
+| **openEuler** | All supported versions |
+| **openCloudOS** | 9+ |
+| **Kylin** (银河麒麟) | All supported versions |
+
+**Architectures:** **x86_64** (amd64) and **aarch64** (arm64).
+
+## Hardware
+
+| Resource | Minimum | Recommended |
+|----------|---------|-------------|
+| **CPU** | 1 core | 2+ cores |
+| **RAM** | **512 MB** | **1 GB+** (more if running containers, databases, or AI features) |
+| **Disk** | **1 GB** free | **10 GB+** free (for panel, logs, backups, and container images) |
+
+## Network & Ports
+
+The following ports must be open in your server firewall and cloud security group:
+
+| Port | Service | Required? |
+|------|---------|-----------|
+| **39921** | Web.Casa management panel | Yes |
+| **80** | Caddy HTTP traffic | Yes (for HTTPS cert issuance) |
+| **443** | Caddy HTTPS traffic | Yes |
+| **22** | SSH | Recommended (do not lock yourself out when configuring the firewall plugin) |
+
+> Your server needs a **public IP address** for automatic HTTPS certificate issuance via Let's Encrypt. Make sure your domain's DNS A/AAAA records point to the server IP before enabling HTTPS.
+
+## Optional Dependencies
+
+### Docker Features
+
+Docker is **not** required to run the Web.Casa panel itself, but is needed for:
+
+- Container management
+- Compose stacks
+- App Store installations
+- Database management (MySQL, PostgreSQL, MariaDB, Redis run as containers)
+
+> Docker Engine can be installed directly through the Web.Casa panel — no manual setup needed.
+
+### Building from Source
+
+If you plan to compile Web.Casa yourself instead of using the install script, you need:
+
+- **Go 1.26+**
+- **Node.js 24+**
+- **GCC** (for CGo / SQLite compilation)
+
+### DNS Provider Credentials
+
+Only needed for **DNS challenge-based wildcard certificates**. Supported providers:
+
+- Cloudflare
+- Alibaba Cloud DNS (AliDNS)
+- Tencent Cloud DNS (DNSPod)
+- Amazon Route53
+
+> Ready to install? Head to the [Installation guide](/getting-started/installation/).

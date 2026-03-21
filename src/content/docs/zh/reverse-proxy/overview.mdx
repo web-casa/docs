@@ -1,0 +1,79 @@
+---
+title: 反向代理概述
+description: Web.Casa 基于 Caddy 的反向代理功能概览，支持多种站点类型
+---
+
+Web.Casa 使用 **Caddy** 作为底层反向代理引擎。所有配置变更通过 Caddy 的 **Admin API** 实时推送，**无需重启、无需重载、零停机**。
+
+## 站点类型
+
+Web.Casa 支持四种站点类型，适用于不同场景：
+
+| 站点类型 | 说明 | 典型用途 |
+|---------|------|---------|
+| **反向代理** | 将请求转发到一个或多个上游服务器，支持 **Round Robin** 负载均衡 | Web 应用、API、微服务 |
+| **重定向** | 将访客发送到目标 URL，支持 **301**（永久）或 **302**（临时）状态码 | 域名迁移、短链接 |
+| **静态站点** | 从服务器目录直接提供文件服务 | 文档站、落地页、SPA |
+| **PHP 站点** | 通过 **FastCGI** 将请求路由到 PHP-FPM（`localhost:9000` 或 Unix Socket） | WordPress、Laravel、自定义 PHP |
+
+> **重定向**类型会自动将**原始 URI 路径**附加到目标 URL，确保深层链接不会丢失。
+
+## Caddy 集成原理
+
+1. 在 Web.Casa 面板中创建或编辑站点。
+2. Web.Casa 将设置转换为有效的 Caddy 配置。
+3. 通过 Caddy **Admin API** 即时推送配置。
+4. Caddy 立即应用变更，**无需重启进程**。
+
+所有站点配置持久化存储在 Web.Casa 的 **SQLite 数据库**中，并与 Caddy 运行配置保持同步。若 Caddy 重启，Web.Casa 会自动重建完整配置。
+
+## 站点功能
+
+每个站点（无论类型）均可配置以下功能：
+
+- **TLS / SSL** -- 六种模式：自动（ACME）、DNS 验证、通配符（DNS）、自定义证书、关闭（仅 HTTP）、内部（自签名）
+- **WebSocket 支持** -- 代理 WebSocket 连接到上游服务器
+- **压缩** -- 支持 Gzip 和 Zstd 响应压缩
+- **安全头** -- `X-Frame-Options`、`X-Content-Type-Options`、`X-XSS-Protection`
+- **CORS 跨域** -- 可配置允许的来源、方法和头信息
+- **自定义错误页面** -- 为 404、500 等状态码配置自定义页面
+- **自定义 Caddyfile 指令** -- 注入原始 Caddyfile 代码段，满足高级需求
+- **HTTP Basic Auth** -- 使用 **bcrypt** 加密的密码保护
+- **IP 访问控制** -- 白名单或黑名单，支持 CIDR 格式
+- **HTTP 到 HTTPS 重定向** -- 强制所有流量使用 HTTPS
+- **分组和标签** -- 按项目、环境或团队组织站点
+- **站点克隆** -- 一键复制现有站点配置
+- **DNS 检查** -- 在上线前验证 A/AAAA 记录是否指向服务器 IP
+
+## 站点模板
+
+Web.Casa 内置**预设模板**，帮助快速完成常见配置：
+
+- **WordPress** -- 针对 WordPress 优化的 PHP-FPM 规则
+- **SPA**（单页应用） -- 静态站点 + 回退路由
+- **API** -- 针对 API 后端优化的反向代理
+- **PHP-FPM** -- 通用 PHP FastCGI 配置
+- **静态文件服务器** -- 目录服务 + 可选索引文件
+- **WebSocket** -- 支持 WebSocket 透传的反向代理
+
+模板会预填站点设置，你可以在保存前自由调整。
+
+## SSL/TLS
+
+Caddy 自动处理 TLS 证书签发：
+
+- 通过 ACME HTTP-01 / TLS-ALPN-01 验证自动获取 **Let's Encrypt** 或 **ZeroSSL** 证书（默认）
+- **DNS 验证**支持通配符域名和防火墙后的服务器
+- **自定义证书上传**支持商业 CA 或内部 PKI 证书
+
+详见 [SSL/TLS 证书](/zh/reverse-proxy/ssl-tls/) 和 [DNS 验证与通配符](/zh/reverse-proxy/dns-challenge/)。
+
+## 仪表盘
+
+反向代理仪表盘提供所有站点的概览：
+
+- **状态** -- 已启用或已禁用
+- **站点类型** -- 反向代理、重定向、静态、PHP
+- **SSL 证书**到期日期
+- **分组和标签**筛选
+- **快捷操作** -- 编辑、克隆、启用/禁用、删除

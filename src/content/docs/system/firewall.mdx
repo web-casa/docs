@@ -1,0 +1,79 @@
+---
+title: Firewall
+description: Manage firewalld zones, port rules, service rules, rich rules, and interfaces from the web UI
+---
+
+Web.Casa provides a **firewall management interface** built on **firewalld**. Configure zones, port rules, service rules, and rich rules without touching the command line.
+
+## Overview
+
+The firewall plugin manages your server's **firewalld** configuration through the Web.Casa UI. If firewalld is not installed, the panel offers a **one-click install** option.
+
+> **Warning: Docker port bypass** -- Docker manages its own iptables rules and may bypass firewalld. Ports exposed by Docker containers (`-p` flag) are accessible regardless of firewalld rules. Use Docker network configuration or the `--iptables=false` Docker daemon option if you need strict firewall control over container ports.
+
+## Zone Management
+
+Firewalld organizes rules into **zones**. The firewall dashboard shows:
+
+- **Active zones** -- zones currently bound to interfaces or sources
+- **Inactive zones** -- available but not in use
+
+Each zone has its own set of rules, interfaces, and sources. Common zones include `public`, `trusted`, `internal`, and `drop`.
+
+## Port Rules
+
+Add port rules to allow or block traffic on specific ports:
+
+| Field | Options |
+|-------|---------|
+| **Port** | Single port (e.g., `8080`) or range (e.g., `3000-3100`) |
+| **Protocol** | TCP or UDP |
+| **Zone** | Target zone for the rule |
+
+### Adding a Port Rule
+
+1. Select the target **zone**
+2. Click **Add Port**
+3. Enter the port number or range
+4. Select the protocol (TCP/UDP)
+5. Save the rule
+
+## Service Rules
+
+Allow traffic for well-known services by name instead of port number:
+
+- `http`, `https`, `ssh`, `dns`, `smtp`, `ftp`
+- And any other service defined in firewalld's service database
+
+This is cleaner than manual port rules and automatically adjusts if the service's default port changes.
+
+## Rich Rules
+
+Rich rules provide **fine-grained control** beyond simple port allow/deny:
+
+```
+rule family="ipv4" source address="10.0.0.0/8" accept
+rule family="ipv4" source address="192.168.1.0/24" port port="3306" protocol="tcp" accept
+rule family="ipv4" source address="203.0.113.50" drop
+```
+
+Rich rules support:
+- **Source address filtering** -- allow or deny specific IPs or CIDR ranges
+- **Port + source combinations** -- restrict a port to specific networks
+- **Protocol matching** -- filter by TCP, UDP, or ICMP
+- **Accept, drop, or reject** actions
+
+## Interfaces and Sources
+
+Assign **network interfaces** and **source addresses** to zones:
+
+- **Interfaces** -- bind a physical or virtual network interface (e.g., `eth0`, `docker0`) to a zone
+- **Sources** -- route traffic from a specific IP or CIDR to a zone for processing
+
+## Configuration Management
+
+- **Reload** firewalld configuration to apply changes without disrupting active connections
+- All rules are persisted to the **permanent** configuration
+- Changes take effect immediately in the **runtime** configuration
+
+> **Tip:** After making firewall changes, test connectivity from an external machine to verify your rules are working as expected. Use the Web Terminal to run diagnostic commands like `firewall-cmd --list-all` for quick verification.

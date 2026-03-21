@@ -1,0 +1,54 @@
+---
+title: Web.Casa 文档
+description: AI 原生的开源服务器管理面板，以 Caddy 作为核心反向代理
+template: splash
+hero:
+  title: Web.Casa
+  tagline: AI 原生的开源服务器管理面板
+  actions:
+    - text: 快速开始
+      link: /zh/getting-started/introduction/
+      icon: right-arrow
+      variant: primary
+    - text: GitHub 仓库
+      link: https://github.com/web-casa/webcasa
+      icon: external
+      variant: minimal
+---
+
+import Card from '../../../components/Card.astro';
+import { CardGrid } from '@astrojs/starlight/components';
+
+## 核心能力
+
+<CardGrid stagger>
+  <Card title="AI & MCP 集成" icon="star">
+    你的 AI 服务器管理副驾驶。用自然语言描述你的需求 — 部署应用、诊断错误、生成配置 — Web.Casa 帮你完成执行。**73 个 AI 工具**、**44 个 MCP 工具**，与 **Cursor**、**Windsurf**、**Claude Code** 无缝集成。内置系统健康巡检和自愈引擎。
+  </Card>
+  <Card title="反向代理 & HTTPS" icon="globe">
+    基于 **Caddy** 管理 **反向代理**、**301/302 重定向**、**静态站点** 和 **PHP/FastCGI** 站点。Let's Encrypt 自动 HTTPS、DNS 验证通配符证书（Cloudflare、阿里云 DNS、腾讯云 DNS、Route53）、自定义头、上游负载均衡、IP 访问控制 —— 全部通过可视化界面完成。
+  </Card>
+  <Card title="Docker & 部署" icon="rocket">
+    完整的容器生命周期管理 —— **容器**、**Compose 编排**、**镜像**、**网络** 和 **卷**。Git 仓库对接，框架自动检测，Webhook 触发自动部署。内置 **应用商店** 一键安装 Docker 应用（兼容 Runtipi 格式）。
+  </Card>
+  <Card title="数据库 & 备份" icon="setting">
+    统一管理 **MySQL**、**PostgreSQL**、**MariaDB** 和 **Redis**，内置 Web SQL 控制台。基于 **Kopia** 的定时备份，支持本地、S3、WebDAV、SFTP 目标存储，可配置保留策略与一键恢复。
+  </Card>
+</CardGrid>
+
+## 更多亮点
+
+<CardGrid>
+  <Card title="实时监控" icon="pulse">
+    通过 WebSocket 实时推送 CPU、内存、磁盘、网络指标。支持阈值 **告警** 与通知推送，保障基础设施健康运行。
+  </Card>
+  <Card title="文件管理 & 终端" icon="document">
+    在浏览器中浏览、上传、下载、编辑和压缩文件。内置 **网页终端**（xterm.js + PTY），支持多标签页 —— 无需 SSH 客户端。
+  </Card>
+  <Card title="安全优先" icon="approve-check">
+    多用户 **RBAC**（管理员 / 查看者角色）、**TOTP 双因素认证**、**ALTCHA 工作量证明** 登录防护、JWT 认证、完整审计日志、API Token 访问。支持 JSON 格式配置导出 / 导入。
+  </Card>
+  <Card title="插件化架构" icon="puzzle">
+    **13 个内置插件** —— Docker、部署、AI、数据库、监控、备份、应用商店、文件管理与终端、防火墙、PHP、MCP 服务器、计划任务。按需启用，随业务增长灵活扩展。
+  </Card>
+</CardGrid>

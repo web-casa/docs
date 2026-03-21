@@ -1,0 +1,173 @@
+---
+title: Installation
+description: Install Web.Casa on your server using one-click script, Docker, or build from source
+---
+
+import { Tabs, TabItem, Steps } from '@astrojs/starlight/components';
+
+Web.Casa can be installed in several ways depending on your environment and preferences. Choose the method that best fits your setup.
+
+<Tabs syncKey="install-method">
+  <TabItem label="One-Click Script" icon="terminal">
+    The fastest way to get started. The install script automatically detects your OS, installs dependencies, and configures Web.Casa.
+
+    **Supported distributions (EL9/EL10 only):**
+    - RHEL 9+
+    - AlmaLinux 9+
+    - Rocky Linux 9+
+    - CentOS Stream 9+
+    - Oracle Linux 9+
+    - Fedora 38+
+    - openAnolis 9+
+    - Alibaba Cloud Linux 3+
+    - openEuler
+    - openCloudOS 9+
+    - Kylin (银河麒麟)
+
+    :::note
+    The pre-built binary requires GLIBC >= 2.32. If your system has an older version, use the `--from-source` flag to compile during installation.
+    :::
+
+    <Steps>
+    1. **Run the install script**
+
+       ```bash
+       curl -fsSL https://raw.githubusercontent.com/web-casa/webcasa/main/install.sh | sudo bash
+       ```
+
+    2. **Access the panel**
+
+       Once installation completes, open your browser and navigate to:
+
+       ```
+       http://YOUR_SERVER_IP:39921
+       ```
+
+    3. **Complete the setup wizard**
+
+       Follow the on-screen prompts to create your admin account and configure initial settings.
+    </Steps>
+  </TabItem>
+
+  <TabItem label="Docker" icon="seti:docker">
+    Run Web.Casa in a container using the included Docker Compose configuration.
+
+    <Steps>
+    1. **Clone the repository and start the container**
+
+       ```bash
+       git clone https://github.com/web-casa/webcasa.git
+       cd webcasa
+       docker compose up -d
+       ```
+
+    2. **Access the panel**
+
+       Open your browser and navigate to:
+
+       ```
+       http://YOUR_SERVER_IP:39921
+       ```
+    </Steps>
+  </TabItem>
+
+  <TabItem label="Build from Source" icon="github">
+    Build Web.Casa from source if you need full control over the build process or your system does not meet the GLIBC requirement for pre-built binaries.
+
+    **Prerequisites:**
+    - Go 1.26+
+    - Node.js 24+
+    - GCC
+
+    <Steps>
+    1. **Clone the repository**
+
+       ```bash
+       git clone https://github.com/web-casa/webcasa.git
+       cd webcasa
+       ```
+
+    2. **Build the frontend**
+
+       ```bash
+       cd web
+       npm install
+       npm run build
+       cd ..
+       ```
+
+    3. **Build the backend**
+
+       ```bash
+       go build -o webcasa .
+       ```
+
+    4. **Start the server**
+
+       ```bash
+       ./webcasa
+       ```
+
+       The panel will be available at `http://YOUR_SERVER_IP:39921`.
+    </Steps>
+
+    :::tip
+    You can also use the one-click script with the `--from-source` flag to automate the source build process:
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/web-casa/webcasa/main/install.sh | sudo bash -s -- --from-source
+    ```
+    :::
+  </TabItem>
+</Tabs>
+
+## Install Script Flags
+
+The one-click install script accepts the following flags:
+
+| Flag | Description |
+| --- | --- |
+| `--port PORT` | Set a custom panel port (default: `39921`) |
+| `--no-caddy` | Skip Caddy web server installation |
+| `--no-docker` | Skip Docker group setup |
+| `--from-source` | Build from source code instead of using the pre-built binary |
+| `-y`, `--yes` | Run in non-interactive mode (accept all defaults) |
+
+**Example:** Install on a custom port without Caddy:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/web-casa/webcasa/main/install.sh | sudo bash -s -- --port 8080 --no-caddy
+```
+
+## Upgrade
+
+To upgrade an existing installation to the latest version:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/web-casa/webcasa/main/install.sh | sudo bash -s -- --upgrade
+```
+
+To upgrade by building from source:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/web-casa/webcasa/main/install.sh | sudo bash -s -- --upgrade-from-source
+```
+
+## Uninstall
+
+**Remove Web.Casa but keep your data:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/web-casa/webcasa/main/install.sh | sudo bash -s -- --uninstall
+```
+
+Data and configuration files in `/var/lib/webcasa/` and `/etc/webcasa/webcasa.env` will be preserved.
+
+**Completely remove Web.Casa including all data:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/web-casa/webcasa/main/install.sh | sudo bash -s -- --purge
+```
+
+:::caution
+The `--purge` flag permanently deletes all Web.Casa data, including site configurations and databases. This action cannot be undone.
+:::

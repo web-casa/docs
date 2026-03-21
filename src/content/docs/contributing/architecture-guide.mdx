@@ -1,0 +1,121 @@
+---
+title: Architecture Guide
+description: Code structure, Handler-Service-Model pattern, and conventions for adding features to Web.Casa
+---
+
+This guide covers the Web.Casa codebase structure and the conventions for adding new features.
+
+## Project Layout
+
+```
+webcasa/
+├── main.go                  # Application entry point
+├── VERSION                  # Version number (single source of truth)
+├── internal/
+│   ├── config/              # Environment config loading
+│   ├── model/               # Database models and DTOs
+│   ├── database/            # SQLite initialization and migrations
+│   ├── auth/                # JWT authentication and middleware
+│   ├── caddy/               # Caddy process management + Caddyfile rendering
+│   ├── service/             # Business logic layer
+│   ├── handler/             # HTTP request handlers
+│   └── plugins/             # Feature plugins (12 built-in)
+└── web/                     # React 19 frontend
+    └── src/
+        └── pages/           # Page components
+```
+
+## Handler-Service-Model Pattern
+
+This is the primary architectural convention. All backend features follow a **three-layer pattern**:
+
+| Layer | Location | Responsibility |
+|-------|----------|----------------|
+| **Handler** | `internal/handler/` | Parse HTTP requests, validate input, call service functions, format JSON responses |
+| **Service** | `internal/service/` | Business logic, database queries, external system interactions (Docker API, Caddy admin API, filesystem) |
+| **Model** | `internal/model/` | Struct definitions, GORM model tags, database migration functions |
+
+This separation keeps business logic **testable independently** of HTTP concerns.
+
+**Data flow:**
+
+```
+HTTP Request → Handler (parse + validate) → Service (logic) → Model (data) → Database
+                                                                              ↓
+HTTP Response ← Handler (format JSON) ← Service (result) ← Model (query) ← SQLite
+```
+
+## Adding a New Feature
+
+Follow these steps to add a new feature to the backend:
+
+1. **Define the data model** in `internal/model/`
+   - Create struct with GORM tags
+   - Add auto-migration in the database initialization
+
+2. **Implement the service layer** in `internal/service/`
+   - Write business logic functions
+   - Handle database operations through GORM
+   - Interact with external systems if needed
+
+3. **Create HTTP handlers** in `internal/handler/`
+   - Parse request parameters and body
+   - Call service functions
+   - Return standardized JSON responses
+
+4. **Register routes** in the handler's `RegisterRoutes()` function
+   - Use appropriate HTTP methods
+   - Apply authentication and RBAC middleware
+
+## Route Conventions
+
+Routes use the **Gin router** and follow REST conventions:
+
+| Method | Pattern | Action |
+|--------|---------|--------|
+| `GET` | `/api/resources` | List all |
+| `GET` | `/api/resources/:id` | Get one |
+| `POST` | `/api/resources` | Create |
+| `PUT` | `/api/resources/:id` | Update |
+| `DELETE` | `/api/resources/:id` | Delete |
+
+All responses use a standardized JSON envelope:
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": { }
+}
+```
+
+## ORM Conventions
+
+Web.Casa uses **GORM** with SQLite (WAL mode):
+
+- Models use GORM struct tags for column definitions
+- Auto-migration handles schema updates
+- Use GORM's query builder for database operations
+- Database file location: `/var/lib/webcasa/webcasa.db`
+
+## Plugin System
+
+Plugins live under `internal/plugins/`. Each plugin implements the **Plugin interface**:
+
+- **`Init()`** -- register routes, event handlers, and database tables through the CoreAPI
+- **`Start()`** -- start background tasks
+- **`Stop()`** -- clean up resources
+- **`Info()`** -- return plugin metadata
+
+See [Plugin System](/plugins/plugin-system/) and [Developing Plugins](/plugins/developing/) for details.
+
+## Frontend Conventions
+
+The React frontend under `web/src/` follows these patterns:
+
+- **Feature-based directories** -- each feature has its own directory with pages, components, hooks, and API client functions
+- **State management** -- Zustand for global state, React hooks for local state
+- **UI components** -- Radix UI Themes 3 for consistent design
+- **Styling** -- Tailwind CSS v4 utility classes
+- **Routing** -- client-side routing with route definitions in the router configuration
+- **Navigation** -- sidebar entries defined in the layout configuration

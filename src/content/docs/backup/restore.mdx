@@ -1,0 +1,68 @@
+---
+title: Restore
+description: Restore data from backup snapshots and manage snapshot lifecycle
+---
+
+Web.Casa provides a snapshot-based restore interface. Browse available snapshots, inspect their contents, and restore data with a confirmation workflow that guards against accidental overwrites.
+
+## Snapshot Management
+
+### Viewing Snapshots
+
+Navigate to the **Backup** section to see all available snapshots. Each snapshot displays:
+
+- **Snapshot ID** -- unique identifier
+- **Creation time** -- when the backup was taken
+- **Backup scope** -- what data the snapshot contains (Panel, Docker Volumes, Database Dumps)
+
+### Filtering Snapshots
+
+Use the **filter by ID** field to search for a specific snapshot when the list is long.
+
+### Deleting Snapshots
+
+1. Select the snapshot you want to remove.
+2. Click **Delete**.
+3. Confirm the action.
+
+> Deleted snapshots cannot be recovered. Only delete snapshots you are certain you no longer need.
+
+## Restoring from a Snapshot
+
+### Step-by-Step
+
+1. Navigate to **Backup > Restore**.
+2. Select the snapshot to restore from.
+3. Review the snapshot contents.
+4. Click **Restore**.
+5. Read the **confirmation dialog** carefully -- it warns that existing data will be **overwritten**.
+6. Confirm to start the restore process.
+
+> **Restoring overwrites current data.** Make sure you have selected the correct snapshot and understand which files will be replaced.
+
+### What Gets Restored
+
+The restore scope depends on what was included in the original backup:
+
+| Backup Scope | Restores |
+|-------------|----------|
+| **Panel** | Web.Casa database and Caddyfile configuration |
+| **Docker Volumes** | Docker volume data back to their original locations |
+| **Database Dumps** | SQL dumps that can be re-imported into database instances |
+
+## Snapshot Logs
+
+Each snapshot has associated **logs** that record the backup operation details:
+
+- **Level** -- info, warning, or error
+- **Timestamp** -- when the log entry was created
+- **Message** -- description of the operation or issue
+
+Access logs by selecting a snapshot and viewing its **Logs** tab. These are useful for diagnosing failed or incomplete backups.
+
+## Best Practices
+
+- **Test restores periodically** -- verify that your backups actually work before you need them in an emergency
+- **Check snapshot logs** after each backup to confirm success
+- **Keep multiple snapshots** so you can choose the right recovery point
+- **Document your backup scopes** so you know exactly what each snapshot contains

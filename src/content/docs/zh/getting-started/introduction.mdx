@@ -1,0 +1,84 @@
+---
+title: 简介
+description: 了解 Web.Casa — AI 原生的开源服务器管理面板
+---
+
+**Web.Casa** 是一个 AI 原生的开源服务器管理面板，基于 **Caddy** 构建。告诉 AI 你需要什么 — 部署应用、诊断错误、创建反向代理 — 它帮你完成。对于其他一切操作，现代化的 Web 界面让你掌握全部控制权：反向代理、容器、数据库、备份等。
+
+- **开源协议：** MIT
+- **默认端口：** `39921`
+- **数据库：** SQLite（WAL 模式），路径 **`/var/lib/webcasa/webcasa.db`**
+
+## 站点类型
+
+Web.Casa 通过 Caddy 支持四种站点类型：
+
+| 类型 | 说明 |
+|------|------|
+| **反向代理** | 将流量转发至上游后端，支持负载均衡、自定义头、IP 访问规则 |
+| **301/302 重定向** | 永久或临时 URL 重定向 |
+| **静态站点** | 直接从磁盘提供静态文件服务 |
+| **PHP / FastCGI** | 通过 FastCGI 运行 PHP 应用，配合托管的 PHP 环境 |
+
+## DNS 验证提供商
+
+用于通配符证书和基于 DNS 的 ACME 验证，支持以下提供商：
+
+- **Cloudflare**
+- **阿里云 DNS**（AliDNS）
+- **腾讯云 DNS**（DNSPod）
+- **Amazon Route53**
+
+## AI & MCP 集成
+
+Web.Casa 内置 AI 助手，拥有 **73 个工具** 覆盖每个子系统，MCP 服务器对外暴露 **44 个工具**。原生支持六大 LLM 供应商：
+
+- **OpenAI**（GPT-4o、o3-mini）
+- **Anthropic**（Claude Sonnet 4、Claude Haiku 4）
+- **Google Gemini**（Gemini 2.0 Flash、Gemini 2.5 Pro）
+- **DeepSeek**（deepseek-chat、deepseek-reasoner）
+- **Moonshot / Kimi**（moonshot-v1-8k/32k/128k）
+- **Zhipu / 智谱**（GLM-4-Flash、GLM-4）
+
+MCP 兼容 IDE — **Cursor**、**Windsurf**、**Claude Code** — 可在编辑器中直接管理服务器。查看 [AI 使用场景](/zh/ai/use-cases/) 了解实际用例。
+
+## 插件体系
+
+Web.Casa 内置 **13 个插件**，可按需启用：
+
+| 插件 | 功能说明 |
+|------|---------|
+| **Docker** | 容器生命周期管理、Compose 编排、镜像、网络、卷 |
+| **部署** | Git 仓库对接，框架自动检测，Webhook 触发部署 |
+| **AI** | 多供应商 LLM 对话、错误诊断、Compose 生成、系统巡检、自愈引擎 |
+| **数据库** | MySQL、PostgreSQL、MariaDB、Redis 管理，内置 Web SQL 控制台 |
+| **监控** | 通过 WebSocket 实时推送 CPU / 内存 / 磁盘 / 网络指标，阈值告警 |
+| **备份** | 基于 Kopia 的备份，支持本地、S3、WebDAV、SFTP，可定时执行 |
+| **应用商店** | 一键安装 Docker 应用（兼容 Runtipi 格式） |
+| **文件管理** | 文件浏览器、在线编辑器、xterm.js 网页终端（多标签页） |
+| **防火墙** | Firewalld 区域、端口、服务和富规则管理 |
+| **PHP** | PHP-FPM 和 FrankenPHP 运行时管理，扩展目录 |
+| **MCP 服务器** | Model Context Protocol 端点，API Token 认证的 AI IDE 集成 |
+| **计划任务** | 定时任务管理，Shell 执行、日志记录、手动触发 |
+
+## 安全特性
+
+- **多用户 RBAC**，支持 **管理员** 和 **查看者** 两种角色
+- **ALTCHA 工作量证明** 登录挑战，防止暴力破解
+- **登录速率限制**，指数退避（5 次 / 15 分钟）
+- **JWT 认证** + **TOTP 双因素认证**，支持恢复码
+- **AES-GCM 加密** 存储所有凭据和 API 密钥
+- **审计日志**，记录所有用户和系统操作
+- **API Token**（`wc_` 前缀），基于范围的权限控制和过期跟踪
+- **Caddyfile 注入防护** — DNS 凭据和自定义指令清理
+- **配置导出 / 导入**，JSON 格式
+
+## 技术栈
+
+| 层级 | 技术 |
+|------|------|
+| **后端** | Go 1.26+、Gin、GORM、SQLite（WAL 模式） |
+| **前端** | React 19、Vite 7、Radix UI Themes 3、Tailwind CSS v4、Zustand 5 |
+| **反向代理** | Caddy（作为子进程管理，通过 Admin API 动态配置） |
+
+> 准备安装？请先查看 [系统要求](/zh/getting-started/requirements/)，然后前往 [安装指南](/zh/getting-started/installation/) 几分钟即可完成部署。

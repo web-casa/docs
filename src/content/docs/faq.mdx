@@ -1,0 +1,136 @@
+---
+title: FAQ
+description: Frequently asked questions about Web.Casa
+---
+
+## What is Web.Casa and how is it different from Nginx Proxy Manager?
+
+Web.Casa is a modern server management panel built on **Caddy** (not Nginx). Unlike Nginx Proxy Manager, it includes an AI assistant, a plugin system, and built-in Docker, database, and project deployment management — all in a single platform.
+
+- Automatic HTTPS via Caddy with zero configuration
+- AI-powered error diagnosis and Docker Compose generation
+- Extensible plugin architecture (12+ plugins)
+- Docker, database, file manager, and deployment tools built in
+
+## Which Linux distributions are supported?
+
+Web.Casa supports 10+ mainstream Linux distributions:
+
+- **Ubuntu** 20.04+
+- **Debian** 11+
+- **CentOS Stream** 8+
+- **AlmaLinux** 8+
+- **Fedora** 38+
+- **openAnolis**
+- **Alibaba Cloud Linux**
+- **openEuler**
+- **openCloudOS**
+- **Kylin**
+
+Both `amd64` and `arm64` architectures are supported.
+
+## Can I use Web.Casa without Docker installed?
+
+Yes. Docker is optional. Use the `--no-docker` flag during installation to skip Docker setup. The core reverse proxy, SSL management, and static hosting features work without Docker. Docker-dependent features (containers, Compose stacks, app store) will simply be unavailable.
+
+## How do I change the default port?
+
+Set the `WEBCASA_PORT` environment variable in the configuration file, or pass `--port` during installation:
+
+```bash
+# During installation
+curl -fsSL https://get.web.casa | bash -s -- --port 9090
+
+# After installation, edit the env file
+sudo nano /etc/webcasa/webcasa.env
+# Set: WEBCASA_PORT=9090
+sudo systemctl restart webcasa
+```
+
+## How do I enable wildcard certificates?
+
+Wildcard certificates require DNS Challenge validation. Configure a supported DNS provider (Cloudflare, AliDNS, Tencent Cloud DNS, or Route53) in your host settings, then select the **Wildcard** TLS mode.
+
+1. Go to **Reverse Proxy** > **Hosts** > edit your host
+2. Under TLS settings, choose **DNS Challenge**
+3. Select your DNS provider and enter API credentials
+4. Enable the wildcard option for `*.yourdomain.com`
+
+## How do I backup and restore?
+
+The Backup plugin uses Kopia as its backup engine and supports multiple storage targets:
+
+- **Local** filesystem
+- **S3**-compatible object storage
+- **WebDAV** servers
+- **SFTP** remote hosts
+
+Configure backup schedules with Cron expressions and set retention policies to automatically manage backup history. Restore from any snapshot through the web UI.
+
+## Can multiple users access the panel?
+
+Yes. Web.Casa supports multi-user access with Role-Based Access Control (RBAC). There are two built-in roles:
+
+- **Admin** — full access to all features and settings
+- **Viewer** — read-only access to dashboards and logs
+
+All user actions are recorded in the audit log for accountability.
+
+## What LLM providers does the AI assistant support?
+
+The AI assistant works with any **OpenAI-compatible** API endpoint. This includes OpenAI, Azure OpenAI, Anthropic (via compatible proxies), Ollama, and other local or cloud LLM providers. Configure your API endpoint and key in **Settings > AI Assistant**. API keys are encrypted with AES-256-GCM at rest.
+
+## How do I integrate with Claude Code / Cursor?
+
+Web.Casa includes an MCP Server plugin with 18 tools for IDE integration:
+
+1. Enable the **MCP Server** plugin in Settings
+2. Generate an API token (prefixed with `wc_`) in **Settings > API Tokens**
+3. Configure your IDE with the MCP endpoint:
+
+```json
+{
+  "mcpServers": {
+    "webcasa": {
+      "url": "https://your-server:port/api/mcp/sse",
+      "headers": {
+        "Authorization": "Bearer wc_your_token_here"
+      }
+    }
+  }
+}
+```
+
+Compatible with Cursor, Windsurf, and Claude Code.
+
+## Is Web.Casa production-ready?
+
+Yes. Web.Casa v1.0.0 has been released with comprehensive security hardening including JWT authentication, RBAC authorization, path traversal protection, CORS strict matching, and WebSocket origin validation. It is licensed under MIT and actively used in production environments.
+
+## How do I upgrade?
+
+Run the install script with the `--upgrade` flag:
+
+```bash
+# Standard upgrade (downloads pre-built binary)
+curl -fsSL https://get.web.casa | bash -s -- --upgrade
+
+# Upgrade from source (builds locally)
+curl -fsSL https://get.web.casa | bash -s -- --upgrade-from-source
+```
+
+Your configuration and data are preserved during upgrades.
+
+## How do I uninstall?
+
+The install script supports two uninstall modes:
+
+```bash
+# Clean uninstall (removes binary and service, keeps data)
+curl -fsSL https://get.web.casa | bash -s -- --uninstall
+
+# Complete purge (removes everything including data and config)
+curl -fsSL https://get.web.casa | bash -s -- --purge
+```
+
+The `--purge` option removes all data under `/etc/webcasa/` and the systemd service files.

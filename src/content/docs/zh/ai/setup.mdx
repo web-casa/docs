@@ -1,0 +1,184 @@
+---
+title: AI 助手配置
+description: 配置内置 AI 助手，原生支持 6 大 LLM 供应商
+---
+
+Web.Casa 内置 **AI 助手**，拥有 **73 个工具**，能够管理服务器、诊断问题、生成配置、审查代码、运行系统健康巡检、自动修复问题。原生支持三种 API 协议，覆盖六大 LLM 供应商。
+
+> **警告：** AI 助手可以在你的服务器上执行真实操作（部署项目、运行命令、管理容器）。执行高风险操作前会弹出**确认对话框**，但你仍应仔细审查每个操作。
+
+## 供应商预设
+
+Web.Casa 原生支持 **6 个供应商**，**3 种 API 协议**：
+
+| 供应商 | API 格式 | Base URL | 模型 |
+|--------|---------|----------|------|
+| **OpenAI** | `openai-chat` | `https://api.openai.com` | gpt-4o、gpt-4o-mini、o3-mini |
+| **Anthropic** | `anthropic-messages` | `https://api.anthropic.com` | claude-sonnet-4-20250514、claude-haiku-4-20250414 |
+| **Google Gemini** | `google-generativeai` | `https://generativelanguage.googleapis.com` | gemini-2.0-flash、gemini-2.5-pro |
+| **DeepSeek** | `openai-chat` | `https://api.deepseek.com` | deepseek-chat、deepseek-reasoner |
+| **Moonshot（Kimi）** | `openai-chat` | `https://api.moonshot.cn` | moonshot-v1-8k、moonshot-v1-32k、moonshot-v1-128k |
+| **智谱（Zhipu）** | `openai-chat` | `https://open.bigmodel.cn/api/paas` | glm-4-flash、glm-4 |
+
+任何 **OpenAI 兼容**端点（Ollama、LM Studio、vLLM）也可使用，选择 `openai-chat` 格式并输入自定义 Base URL 即可。
+
+## 配置步骤
+
+1. 进入 **设置 > AI**
+2. 选择**供应商预设**或选择自定义
+3. **API 格式** 根据供应商自动选择
+4. 输入 API 端点的 **Base URL**
+5. 输入 **API Key**（以 AES-GCM 加密存储）
+6. 选择要使用的**模型**
+7. 保存设置并测试连接
+
+> **提示：** API 密钥在存储时经过加密处理，保存后不会在界面中明文显示。
+
+### 嵌入模型（可选）
+
+为实现**语义搜索**和基于向量的记忆检索，你可以配置单独的嵌入模型：
+
+| 供应商 | 模型 |
+|--------|------|
+| **OpenAI** | text-embedding-3-small、text-embedding-3-large、text-embedding-ada-002 |
+| **智谱** | embedding-3、embedding-2 |
+
+可选提供独立的嵌入端点凭据（Base URL + API Key）。如未指定，将使用主供应商的凭据。
+
+## 聊天界面
+
+AI 助手通过 Web.Casa 界面中的**聊天面板**使用：
+
+- **对话历史** — 会话内保持之前的消息记录
+- **全屏模式** — 展开聊天面板进行复杂交互
+- **Ctrl+Enter** 发送消息
+- 随时清除对话历史
+
+## 工具（共 73 个）
+
+AI 助手拥有 **73 个工具**，分为 17 个类别：
+
+### 站点管理（7 个）
+- `list_hosts` — 列出所有反向代理站点
+- `get_host` — 获取特定站点详情
+- `create_host` — 创建新的反向代理站点
+- `update_host` — 修改现有站点
+- `delete_host` — 永久删除站点
+- `toggle_host` — 启用或禁用站点
+- `clone_host` — 将站点配置复制到新域名
+
+### 项目部署（10 个）
+- `list_projects` — 列出所有已部署项目
+- `get_project` — 获取项目详情
+- `create_project` — 从 Git 仓库创建新项目
+- `deploy_project` — 触发构建和部署
+- `get_build_log` — 获取构建日志
+- `get_runtime_log` — 获取运行时日志
+- `start_project` / `stop_project` — 启动或停止项目
+- `rollback_project` — 回滚到指定构建版本
+- `auto_deploy` — 一条命令：Git URL → 创建项目 → 框架检测 → 构建 → 反向代理 + HTTPS
+
+### Docker 操作（10 个）
+- `docker_ps` — 列出所有容器及状态
+- `docker_logs` — 查看容器日志
+- `docker_list_stacks` — 列出 Compose Stack
+- `docker_manage_container` — 启动、停止或重启容器
+- `docker_run_container` — 创建并运行新容器
+- `docker_pull_image` — 从镜像仓库拉取镜像
+- `docker_get_container_stats` — 实时 CPU/内存/网络/IO 统计
+- `docker_remove_container` — 删除容器
+- `docker_prune` — 清理未使用的资源（容器、镜像、卷或全部）
+
+### 数据库操作（5 个）
+- `database_list_instances` — 列出 MySQL、PostgreSQL、MariaDB、Redis 实例
+- `database_create_instance` — 在 Docker 中创建新数据库实例
+- `database_create_database` — 创建逻辑数据库
+- `database_create_user` — 创建数据库用户并授权
+- `database_execute_query` — 执行只读 SQL 查询（SELECT、SHOW、DESCRIBE、EXPLAIN）
+
+### 文件管理（5 个）
+- `read_file` — 读取文件内容（限制在安全目录）
+- `list_dir` — 列出目录内容及元数据
+- `write_file` — 创建或覆写文件（最大 1MB）
+- `delete_file` — 删除文件或目录
+- `rename_file` — 重命名或移动文件
+
+### 系统与指标（3 个）
+- `get_system_metrics` — 当前 CPU、内存、磁盘使用率
+- `get_system_info` — 主机名、操作系统、内核、运行时间、CPU 核数、架构
+- `run_command` — 执行 Shell 命令（危险命令被阻止）
+
+### AI 诊断（6 个）
+- `suggest_env_vars` — 推荐框架环境变量
+- `generate_dockerfile` — 生成优化的生产级 Dockerfile
+- `diagnose_runtime` — AI 分析运行时日志中的错误和性能问题
+- `review_code` — 安全、性能和最佳实践代码审查
+- `suggest_rollback` — 分析部署历史并推荐回滚
+- `summarize_alerts` — AI 汇总近期监控告警并分析根因
+
+### 记忆（4 个）
+- `save_memory` — 存储持久化信息供后续对话使用
+- `search_memory` — 按关键词搜索记忆（支持向量检索）
+- `list_memories` — 分页列出已存储的记忆
+- `delete_memory` — 删除记忆条目
+
+### 防火墙（3 个）
+- `firewall_status` — 获取 firewalld 状态、区域和活跃规则
+- `list_firewall_rules` — 列出指定区域的端口、服务和富规则
+- `manage_firewall_rule` — 添加或删除防火墙规则
+
+### PHP（2 个）
+- `php_list_runtimes` — 列出已安装的 PHP 运行时（FPM + FrankenPHP）
+- `php_list_sites` — 列出 PHP 站点及版本和运行时信息
+
+### Caddy 管理（3 个）
+- `caddy_status` — Caddy 版本、运行状态、配置路径
+- `caddy_restart` — 重启 Caddy
+- `caddy_reload` — 无中断重载配置
+
+### 通知渠道（2 个）
+- `list_notify_channels` — 列出已配置的通道（Webhook、邮件、Discord、Telegram）
+- `test_notify_channel` — 发送测试消息
+
+### 监控告警规则（3 个）
+- `list_alert_rules` — 列出所有告警规则及状态
+- `create_alert_rule` — 创建阈值告警（如 CPU > 90% 持续 5 分钟）
+- `delete_alert_rule` — 删除告警规则
+
+### 应用商店（3 个）
+- `appstore_search_apps` — 搜索可用应用
+- `appstore_install_app` — 通过 Docker 一键安装
+- `appstore_list_installed` — 列出已安装应用
+
+### 备份（1 个）
+- `trigger_backup` — 触发即时系统备份
+
+### 系统巡检（1 个）
+- `run_inspection` — 全面健康检查：磁盘、内存、容器、SSL 证书，并生成 AI 摘要报告
+
+### 计划任务管理（6 个）
+- `list_cron_jobs` — 列出所有定时任务（可按标签筛选）
+- `get_cron_job_logs` — 获取任务执行日志
+- `create_cron_job` — 创建定时任务（标准 5 字段 cron 格式）
+- `update_cron_job` — 更新任务设置
+- `delete_cron_job` — 删除任务及其日志
+- `trigger_cron_job` — 手动立即执行任务
+
+## 核心能力
+
+### 系统健康巡检
+AI 可运行全面的系统审计，检查磁盘使用率、内存压力、容器健康度、SSL 证书过期、配置问题。结果包含 AI 生成的摘要和优先级建议。
+
+### 自愈引擎
+当监控告警触发时，AI 的 **SelfHealEngine** 自动分析情况并建议修复操作。设有速率限制（5 分钟冷却），通过 EventBus 与监控告警系统集成。
+
+### 构建失败自动诊断
+项目构建失败时（`deploy.build.failed` 事件），AI 自动分析构建日志并提供诊断和修复建议 — 无需手动干预。
+
+### Compose 生成
+用自然语言描述你想部署的应用，AI 生成完整的 `docker-compose.yml`：
+
+> "搭建一个带有 MySQL 和 Redis 缓存的 WordPress 站点"
+
+### 确认对话框
+修改服务器的操作会触发**确认对话框**，显示将要执行的具体内容。你必须批准后操作才会执行。

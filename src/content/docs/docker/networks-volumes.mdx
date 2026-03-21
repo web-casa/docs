@@ -1,0 +1,133 @@
+---
+title: Networks & Volumes
+description: Manage Docker networks and volumes for container communication and persistent storage
+---
+
+Networks and volumes are foundational building blocks for Docker deployments. Web.Casa provides dedicated management interfaces for creating, inspecting, and removing both.
+
+---
+
+## Networks
+
+Docker networks enable **container-to-container communication**. Containers on the same network can resolve each other by name.
+
+### Network List
+
+The network dashboard shows all Docker networks with:
+
+| Column | Description |
+|--------|-------------|
+| **Name** | Network name |
+| **Driver** | Network driver type |
+| **Scope** | `local` or `swarm` |
+| **Created** | Creation timestamp |
+
+### Creating a Network
+
+1. Click **Create Network**.
+2. Configure the following:
+
+| Setting | Description |
+|---------|-------------|
+| **Name** | A descriptive network name |
+| **Driver** | `bridge` (default), `host`, `overlay`, `macvlan`, or `none` |
+| **Subnet** | IP subnet (e.g., `172.20.0.0/16`) |
+| **Gateway** | Gateway IP address |
+| **IP Range** | Allocatable IP range within the subnet |
+| **Driver Options** | Additional key-value driver-specific settings |
+
+3. Click **Create**.
+
+**Common driver choices:**
+
+- **bridge** -- the most common choice for single-host setups; containers on the same bridge can communicate by name
+- **host** -- container shares the host network stack directly (no port mapping needed)
+- **overlay** -- for multi-host communication in Docker Swarm
+- **macvlan** -- assigns a MAC address to the container, making it appear as a physical device on the network
+
+> Use separate bridge networks for different application stacks to provide **network isolation**. For example, keep your database containers on a private network that only your application containers can access.
+
+### Deleting a Network
+
+Select one or more networks and click **Delete**. Web.Casa will warn you if any containers are currently connected to the network.
+
+> You cannot delete Docker's default networks (`bridge`, `host`, `none`). Only user-created networks can be removed.
+
+---
+
+## Volumes
+
+Docker volumes provide **persistent data storage** that survives container restarts and removal.
+
+### Volume List
+
+The volume dashboard shows all Docker volumes with:
+
+| Column | Description |
+|--------|-------------|
+| **Name** | Volume name |
+| **Driver** | Storage driver (usually `local`) |
+| **Mountpoint** | Filesystem path where data is stored on the host |
+
+### Creating a Volume
+
+1. Click **Create Volume**.
+2. Specify:
+   - **Name** -- a descriptive volume name
+   - **Driver** -- storage driver (default: `local`)
+   - **Driver Options** -- additional key-value options if needed
+3. Click **Create**.
+
+### Volume Actions
+
+| Action | Description |
+|--------|-------------|
+| **View Mountpoint** | See the host filesystem path where data is stored |
+| **Delete** | Remove the volume and its data |
+| **Prune** | Remove **all volumes** not currently attached to any container |
+
+> **Warning:** Deleting a volume permanently destroys its data. Always verify a volume is no longer needed before deletion. Consider backing up important data first.
+
+### When to Use Volumes
+
+Volumes are the recommended approach for:
+
+- **Database storage** -- PostgreSQL, MySQL, MongoDB data directories
+- **Upload directories** -- user-uploaded files that must persist
+- **Configuration files** -- persistent config that should survive container updates
+- **Shared data** -- files that need to be accessed by multiple containers
+
+---
+
+## Compose Integration
+
+When you deploy a **Compose stack**, the networks and volumes defined in the Compose file are created automatically:
+
+```yaml
+services:
+  app:
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - app-data:/data
+
+  db:
+    networks:
+      - backend
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+networks:
+  frontend:
+  backend:
+    internal: true  # no external access
+
+volumes:
+  app-data:
+  db-data:
+```
+
+These resources appear in the Networks and Volumes management interfaces and can be inspected independently of the Compose stack.
+
+> **Warning:** Removing a network or volume that belongs to an active Compose stack may cause service disruptions. Always stop the stack first if you need to modify its resources.

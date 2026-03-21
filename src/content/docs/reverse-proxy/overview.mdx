@@ -1,0 +1,79 @@
+---
+title: Reverse Proxy Overview
+description: How Web.Casa uses Caddy to manage reverse proxy, redirect, static, and PHP hosts
+---
+
+Web.Casa uses **Caddy** as its reverse proxy engine. All configuration changes are pushed through Caddy's **Admin API** in real time -- no process restarts, no reloads, **zero downtime**.
+
+## Host Types
+
+Web.Casa supports four distinct host types, each tailored to a specific use case:
+
+| Host Type | Description | Common Use Cases |
+|-----------|-------------|-----------------|
+| **Reverse Proxy** | Forwards requests to one or more upstream servers with **Round Robin** load balancing | Web apps, APIs, microservices |
+| **Redirect** | Sends visitors to a target URL with **301** (permanent) or **302** (temporary) status codes | Domain migrations, vanity URLs |
+| **Static Website** | Serves files directly from a directory on the server | Docs, landing pages, SPAs |
+| **PHP Site** | Routes requests through **FastCGI** to PHP-FPM (`localhost:9000` or a Unix socket) | WordPress, Laravel, custom PHP |
+
+> For **Redirect** hosts, Web.Casa automatically appends the **original URI path** to the target URL, preserving deep links.
+
+## How Caddy Integration Works
+
+1. You create or edit a host in the Web.Casa panel.
+2. Web.Casa translates your settings into valid Caddy configuration.
+3. The configuration is pushed to Caddy via its **Admin API** instantly.
+4. Caddy applies the change with **no process restart** required.
+
+All host configurations are persisted in the Web.Casa **SQLite database** and kept in sync with Caddy's running config. If Caddy restarts, Web.Casa rebuilds the full configuration automatically.
+
+## Per-Host Features
+
+Every host -- regardless of type -- can be configured with:
+
+- **TLS / SSL** -- Six modes: Auto (ACME), DNS Challenge, Wildcard (DNS), Custom Certificate, Off (HTTP only), Internal (self-signed)
+- **WebSocket support** -- Proxy WebSocket connections to upstream servers
+- **Compression** -- Gzip and Zstd compression for responses
+- **Security headers** -- `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection`
+- **CORS** -- Configurable allowed origins, methods, and headers
+- **Custom error pages** -- Branded pages for 404, 500, and other status codes
+- **Custom Caddyfile directives** -- Inject raw Caddyfile snippets for advanced use cases
+- **HTTP Basic Auth** -- Password protection with **bcrypt**-encrypted credentials
+- **IP access control** -- Whitelist or blacklist IPs and CIDR ranges
+- **HTTP to HTTPS redirect** -- Force all traffic to HTTPS
+- **Groups and Tags** -- Organize hosts by project, environment, or team
+- **Host cloning** -- Duplicate an existing host configuration in one click
+- **DNS check** -- Validate A/AAAA records against your server's IP before going live
+
+## Templates
+
+Web.Casa includes **preset templates** to accelerate common setups:
+
+- **WordPress** -- PHP-FPM with WordPress-optimized rules
+- **SPA** (Single Page Application) -- Static site with fallback routing
+- **API** -- Reverse proxy tuned for API backends
+- **PHP-FPM** -- Generic PHP FastCGI configuration
+- **Static File Server** -- Directory serving with optional index files
+- **WebSocket** -- Reverse proxy with WebSocket pass-through
+
+Templates pre-fill host settings that you can customize before saving.
+
+## SSL/TLS
+
+Caddy handles TLS certificate provisioning automatically:
+
+- **Let's Encrypt** or **ZeroSSL** via ACME HTTP-01 / TLS-ALPN-01 challenge (default)
+- **DNS challenge** for wildcard domains and servers behind firewalls
+- **Custom certificate upload** for commercial or internal PKI certificates
+
+See [SSL/TLS Certificates](/reverse-proxy/ssl-tls/) and [DNS Challenge & Wildcards](/reverse-proxy/dns-challenge/) for details.
+
+## Dashboard
+
+The Reverse Proxy dashboard gives you an at-a-glance view of all configured hosts:
+
+- **Status** -- Enabled or disabled
+- **Host type** -- Reverse Proxy, Redirect, Static, or PHP
+- **SSL certificate** expiry dates
+- **Groups and tags** for filtering
+- **Quick actions** -- Edit, clone, enable/disable, delete

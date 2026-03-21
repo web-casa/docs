@@ -1,0 +1,105 @@
+---
+title: Images & Registries
+description: Pull, manage, and delete Docker images in Web.Casa
+---
+
+The Images module provides a complete interface for managing Docker images on your server -- from pulling new images off Docker Hub to pruning unused ones to reclaim disk space.
+
+## Image List
+
+The image dashboard displays all local images with the following details:
+
+| Column | Description |
+|--------|-------------|
+| **Repository** | Image name and tag (e.g., `nginx:alpine`) |
+| **Image ID** | Unique SHA256 identifier |
+| **Size** | Disk space consumed |
+| **Created** | When the image was built |
+
+- **Sort by size** to quickly identify images consuming the most disk space
+- **Search** by image name or tag to locate specific images
+- Images currently used by containers are clearly indicated
+
+---
+
+## Pulling Images
+
+### From Docker Hub
+
+1. Click **Pull Image**.
+2. Enter the image name and optional tag (e.g., `nginx:latest`, `postgres:16-alpine`).
+3. Click **Pull**.
+
+Pull progress is displayed in real time, showing each layer's download and extraction status.
+
+### Searching Docker Hub
+
+Web.Casa includes a built-in **Docker Hub search** feature:
+
+1. Click **Search** or use the search bar in the Pull dialog.
+2. Enter a keyword (e.g., `redis`, `mysql`).
+3. Browse results showing image name, description, star count, and official status.
+4. Click **Pull** on any search result to download it directly.
+
+> If you are in mainland China and experience slow pulls, configure **registry mirrors** in Docker daemon settings. Web.Casa provides one-click presets for popular Chinese mirrors.
+
+---
+
+## Running a Container from an Image
+
+From the image list, you can launch a container directly:
+
+1. Click the **Run** action on any image.
+2. This opens the container creation form pre-filled with the selected image.
+3. Configure ports, volumes, environment variables, and other settings.
+4. Click **Create** to start the container.
+
+---
+
+## Pruning Unused Images
+
+Over time, unused images accumulate and consume disk space. Web.Casa provides a **Prune** function to clean them up:
+
+1. Click **Prune Unused Images**.
+2. Review the list of images that will be removed (images not referenced by any container).
+3. Confirm to reclaim disk space.
+
+The prune operation reports:
+
+- **Number of images removed**
+- **Total disk space reclaimed**
+
+> Pruning only removes images that are **not used by any container** (running or stopped). It will not affect your active services.
+
+---
+
+## Image Actions
+
+| Action | Description |
+|--------|-------------|
+| **Pull** | Download an image from a registry |
+| **Run** | Create and start a container from the image |
+| **Delete** | Remove the image from the local store |
+| **Prune** | Bulk-remove all unused images |
+
+> Attempting to delete an image that is in use by a running or stopped container will trigger a confirmation warning to prevent breaking active services.
+
+---
+
+## Registry Configuration
+
+Docker daemon settings (accessible via **Docker > Settings**) allow you to configure:
+
+### Registry Mirrors
+
+Add mirror URLs to accelerate image pulls. Pre-configured options include:
+
+- **China mirror presets** -- Aliyun, Tencent Cloud, USTC, and other popular Chinese mirrors with one-click setup
+
+### Insecure Registries
+
+For private registries using HTTP instead of HTTPS:
+
+1. Navigate to **Docker > Settings > Insecure Registries**.
+2. Add the registry address (e.g., `192.168.1.100:5000`).
+3. Save and restart the Docker daemon when prompted.

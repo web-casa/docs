@@ -1,0 +1,114 @@
+---
+title: DNS Challenge & Wildcards
+description: Configure DNS providers for wildcard certificates and DNS-01 challenge validation
+---
+
+DNS challenge validation proves domain ownership by creating a **DNS TXT record** instead of responding to an HTTP request. This is **required** for wildcard certificates and essential when your server is not directly reachable from the internet.
+
+## When to Use DNS Challenge
+
+- **Wildcard certificates** -- `*.example.com` requires DNS validation; HTTP challenge cannot be used
+- **Servers behind NAT** -- No inbound access on ports 80/443
+- **Servers behind CDN** -- Cloudflare, AWS CloudFront, or other CDN proxies intercept HTTP challenges
+- **Firewall restrictions** -- Corporate or ISP firewalls blocking challenge traffic
+- **Internal servers with public domains** -- Private IP but publicly resolvable domain name
+
+## Supported DNS Providers
+
+| Provider | Required Credentials | Notes |
+|----------|---------------------|-------|
+| **Cloudflare** | API Token with `Zone:DNS:Edit` permission | Most common; fast propagation |
+| **Alibaba Cloud DNS** | AccessKey ID + AccessKey Secret | Chinese mainland DNS |
+| **Tencent Cloud DNS** (DNSPod) | SecretId + SecretKey | Chinese mainland DNS |
+| **AWS Route 53** | Access Key + Secret Key + Region | Requires IAM permissions for hosted zone |
+
+## Adding a DNS Provider
+
+1. Go to **Settings > DNS Providers**.
+2. Click **Add Provider**.
+3. Select your DNS service from the dropdown.
+4. Enter the required API credentials:
+
+**Cloudflare:**
+- **API Token** -- Create a token at [Cloudflare Dashboard](https://dash.cloudflare.com/profile/api-tokens) with **Zone > DNS > Edit** permission
+
+**Alibaba Cloud DNS:**
+- **Access Key ID** -- From the Alibaba Cloud AccessKey Management console
+- **Access Key Secret** -- The corresponding secret
+
+**Tencent Cloud DNS:**
+- **Secret ID** -- From the Tencent Cloud API Key Management console
+- **Secret Key** -- The corresponding secret
+
+**AWS Route 53:**
+- **Access Key** -- IAM user access key with Route 53 permissions
+- **Secret Key** -- The corresponding secret
+- **Region** -- AWS region (e.g., `us-east-1`)
+
+5. Click **Save**.
+
+> Each provider can be set as the **default** DNS provider. New hosts using DNS challenge will automatically use the default provider unless overridden.
+
+## Using DNS Challenge for a Host
+
+1. Create or edit a host in the **Reverse Proxy** section.
+2. Under TLS mode, select **DNS Challenge** (or **Wildcard (DNS)** for wildcard domains).
+3. Choose the configured DNS provider from the dropdown.
+4. For wildcard certificates, enter the domain as `*.example.com`.
+5. Click **Save**.
+
+Caddy then automatically:
+
+1. Creates the required `_acme-challenge` TXT record via the provider's API
+2. Waits for DNS propagation
+3. Completes the ACME DNS-01 challenge with Let's Encrypt / ZeroSSL
+4. Cleans up the TXT record after validation
+5. Renews the certificate automatically before expiry
+
+## Wildcard Certificates
+
+A wildcard certificate for `*.example.com` covers all single-level subdomains:
+
+- `app.example.com`
+- `api.example.com`
+- `blog.example.com`
+
+**It does not cover:**
+
+- The bare domain `example.com` (create a separate host)
+- Nested subdomains like `sub.app.example.com` (requires its own certificate or a separate wildcard)
+
+To set up a wildcard certificate:
+
+1. Add a DNS provider (see above).
+2. Create a new host with the domain `*.example.com`.
+3. Select **Wildcard (DNS)** as the TLS mode.
+4. Choose the DNS provider.
+5. Save the host.
+
+## Multiple Providers
+
+You can configure **multiple DNS providers** simultaneously. Each host can use a different provider, which is useful when:
+
+- Managing domains across different registrars
+- Different teams use different DNS services
+- Migrating from one DNS provider to another
+
+## Troubleshooting
+
+**Certificate issuance fails:**
+
+- Verify the API credentials are correct and have the required permissions
+- Ensure the domain is managed by the selected DNS provider
+- Check that the DNS provider's API is reachable from the server
+
+**DNS propagation timeout:**
+
+- Some providers take longer to propagate TXT records
+- Caddy will retry automatically, but very slow propagation (>2 minutes) may cause timeouts
+- Verify the TXT record appears using `dig _acme-challenge.example.com TXT`
+
+**Wildcard not covering expected subdomains:**
+
+- Confirm the host domain is exactly `*.example.com` (not `example.com`)
+- Ensure the TLS mode is set to **Wildcard (DNS)**, not just **DNS Challenge**

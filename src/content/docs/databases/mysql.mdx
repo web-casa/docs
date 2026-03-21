@@ -1,0 +1,97 @@
+---
+title: MySQL / MariaDB
+description: Create and manage MySQL/MariaDB instances, databases, users, and run queries through the web SQL console
+---
+
+Web.Casa provides full lifecycle management for **MySQL** and **MariaDB** through Docker-based instances. Create, configure, and administer databases entirely from the web panel.
+
+## Instance Management
+
+Each MySQL/MariaDB instance runs as an **isolated Docker container**. You can manage multiple instances simultaneously.
+
+### Creating an Instance
+
+1. Navigate to **Databases** and click **Create Instance**.
+2. Select the engine: **MySQL** or **MariaDB**.
+3. Configure the instance name and root password.
+4. Optionally select a **preset** (Development or Production).
+5. Click **Create** to spin up the container.
+
+### Instance Operations
+
+| Action | Description |
+|--------|-------------|
+| **Start** | Boot the container and accept connections |
+| **Stop** | Gracefully shut down the instance |
+| **Delete** | Remove the container and all associated data |
+
+> Deleting an instance is **irreversible**. Back up your databases before deleting.
+
+## Connection Info
+
+Each instance provides ready-to-use connection details in multiple formats:
+
+- **CLI command** -- copy-paste into a terminal to connect immediately
+- **Connection URI** -- `mysql://user:password@host:port/dbname` for application configs
+- **Environment variable** -- `DATABASE_URL=...` for `.env` files
+- **Docker internal address** -- for services running in the same Docker network
+
+## Database Operations
+
+### Creating a Database
+
+1. Open your MySQL/MariaDB instance.
+2. Go to the **Databases** tab and click **Create Database**.
+3. Enter a database name.
+4. Select **character set** (default: `utf8mb4`) and **collation**.
+5. Click **Create**.
+
+### Dropping a Database
+
+Select a database from the list and click **Drop**. Confirm the action in the dialog.
+
+> Dropping a database permanently deletes all tables and data within it.
+
+## User Management
+
+### Creating a User
+
+1. Go to the **Users** tab and click **Create User**.
+2. Set the **username** and **password**.
+3. Click **Create**.
+
+### Granting Database Access
+
+After creating a user, grant them access to one or more databases:
+
+1. Select the user from the list.
+2. Choose the target database(s).
+3. Click **Grant Access**.
+
+### Dropping a User
+
+Select a user and click **Drop** to remove them and revoke all associated privileges.
+
+## Query Console
+
+The built-in **SQL console** lets you execute queries against any instance directly from the browser:
+
+- Write and run **SQL statements** with results displayed in a tabular format
+- Switch between instances and databases from a dropdown
+- View query execution time and row counts
+
+> The query console works across all MySQL and MariaDB instances managed by Web.Casa.
+
+## Advanced Configuration
+
+Fine-tune instance performance through the **Settings** tab. You can also apply a **Development** or **Production** preset as a starting point.
+
+| Parameter | Description | Default (Dev) |
+|-----------|-------------|---------------|
+| **InnoDB Buffer Pool Size** | Memory allocated to InnoDB caching | 128 MB |
+| **Max Connections** | Maximum simultaneous client connections | 151 |
+| **Character Set** | Default character set for new databases | `utf8mb4` |
+| **Collation** | Default collation for string comparisons | `utf8mb4_general_ci` |
+| **Slow Query Log** | Log queries exceeding a time threshold | Disabled |
+
+> **Production preset** increases buffer pool size and max connections for higher throughput. **Development preset** uses conservative resource limits suitable for local work.

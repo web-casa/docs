@@ -1,0 +1,73 @@
+---
+title: Authentication & 2FA
+description: JWT-based authentication, ALTCHA Proof-of-Work challenge, TOTP two-factor authentication, and recovery codes
+---
+
+Web.Casa uses a **multi-layered authentication system** combining JWT tokens, Proof-of-Work challenges, and optional TOTP two-factor authentication.
+
+## Authentication Flow
+
+The login process follows these steps:
+
+1. User submits **username and password**
+2. The server issues an **ALTCHA Proof-of-Work (PoW) challenge** that the client must solve
+3. Backend validates credentials against the stored **bcrypt** password hash
+4. If **TOTP 2FA** is enabled, the user must provide a six-digit code from their authenticator app
+5. A signed **JWT token** (HS256 algorithm) is issued upon successful authentication
+6. The token is included as `Authorization: Bearer <token>` in all subsequent API requests
+
+> **ALTCHA is not a CAPTCHA.** It is a Proof-of-Work challenge solved automatically by the client browser. No user interaction is required -- it protects against automated brute-force attacks without degrading the login experience.
+
+## JWT Tokens
+
+All authenticated API requests require a valid JWT token.
+
+| Property | Value |
+|----------|-------|
+| **Algorithm** | HS256 |
+| **Header** | `Authorization: Bearer <token>` |
+| **Secret** | Configured via `WEBCASA_JWT_SECRET` environment variable |
+
+> **Important:** The `WEBCASA_JWT_SECRET` environment variable is **required**. Set it to a strong, random string in `/etc/webcasa/webcasa.env`.
+
+## First-Time Setup
+
+When Web.Casa starts with an empty database, the first user to register is automatically assigned the **Admin** role. This is the only time self-registration is available -- all subsequent users must be created by an administrator.
+
+## Two-Factor Authentication (TOTP)
+
+Web.Casa supports **TOTP** (Time-based One-Time Password) as an optional second authentication factor.
+
+### Setting Up 2FA
+
+1. Navigate to **Settings > Profile**
+2. Click **Enable 2FA**
+3. Scan the displayed **QR code** with your authenticator app
+4. Enter the **six-digit verification code** to confirm binding
+5. **Save your recovery codes** immediately
+
+### Compatible Authenticator Apps
+
+- Google Authenticator
+- Microsoft Authenticator
+- Authy
+- 1Password
+- Bitwarden
+- Any TOTP-compatible app (RFC 6238)
+
+### Recovery Codes
+
+Recovery codes provide a backup method to access your account if your authenticator device is lost or unavailable.
+
+- **8-character** alphanumeric codes
+- Each code is **one-time use** -- it is invalidated after a single successful login
+- Generated during 2FA setup
+- Store them in a **secure, offline location**
+
+> **Warning:** If you lose both your authenticator device and your recovery codes, an administrator must manually disable 2FA on your account to restore access.
+
+## Password Requirements
+
+- Minimum **6 characters**
+- Passwords are hashed with **bcrypt** before storage
+- Plaintext passwords are never stored or logged

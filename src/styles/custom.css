@@ -1,0 +1,46 @@
+/* ============================================
+   Web.Casa Docs — Radix Green + Emerald Theme
+   Accent: #10b981 (Tailwind Emerald 500)
+   Gray: Sage (green-tinted neutrals)
+
+   Starlight color convention:
+     :root          = DARK mode (default)
+     [data-theme='light'] = LIGHT mode
+     "white" = text/foreground color
+     "black" = page background color
+     gray-1 = closest to "white" (text side)
+     gray-6 = closest to "black" (background side)
+   ============================================ */
+
+/* --- Dark Mode (default) --- */
+:root {
+  --sl-color-accent-low: #113b29;
+  --sl-color-accent: #10b981;
+  --sl-color-accent-high: #a7f3d0;
+
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #e0ece4;
+  --sl-color-gray-2: #a8b9ad;
+  --sl-color-gray-3: #728a79;
+  --sl-color-gray-4: #4b5e53;
+  --sl-color-gray-5: #2d3b34;
+  --sl-color-gray-6: #1f2b24;
+  --sl-color-black: #141c18;
+}
+
+/* --- Light Mode --- */
+:root[data-theme='light'] {
+  --sl-color-accent-high: #065f46;
+  --sl-color-accent: #059669;
+  --sl-color-accent-low: #d1fae5;
+
+  --sl-color-white: #141c18;
+  --sl-color-gray-1: #1f2b24;
+  --sl-color-gray-2: #2d3b34;
+  --sl-color-gray-3: #4b5e53;
+  --sl-color-gray-4: #728a79;
+  --sl-color-gray-5: #a8b9ad;
+  --sl-color-gray-6: #e0ece4;
+  --sl-color-gray-7: #f2f7f4;
+  --sl-color-black: #ffffff;
+}

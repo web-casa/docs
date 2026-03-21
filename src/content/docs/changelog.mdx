@@ -1,0 +1,172 @@
+---
+title: Changelog
+description: Web.Casa version history and release notes
+---
+
+## v1.0.0 (2026-03-01) — Web.Casa Pro
+
+10 development phases completed, delivering a full-featured server management platform.
+
+### Phase 0: Plugin System
+
+- Go Interface-based plugin architecture
+- EventBus for inter-plugin communication
+- ConfigStore for persistent plugin configuration
+- CoreAPI for plugin access to platform services
+- Frontend Manifests for UI extension points
+
+### Phase 1: Docker Management
+
+- Compose Stack management (create, start, stop, remove)
+- Container lifecycle controls
+- Image pull, tag, and cleanup
+- Network and Volume management
+- Real-time WebSocket container logs
+
+### Phase 2: Project Deployment
+
+- Git repository support (HTTPS and SSH)
+- 9 framework presets: Next.js, Nuxt, Vite, Remix, Express, Go, Laravel, Flask, Django
+- Systemd service generation and management
+- Webhook triggers for automated deployment
+- Version rollback support
+
+### Phase 3: AI Assistant
+
+- OpenAI-compatible LLM integration with SSE streaming
+- Automated error diagnosis and suggestions
+- Text-to-Compose: natural language to Docker Compose generation
+- AES-256-GCM encryption for API key storage
+
+### Phase 4: File Manager + Web Terminal
+
+- Tree navigation with breadcrumb paths
+- File upload, download, and compression
+- CodeMirror-based in-browser code editor
+- xterm.js PTY with multi-tab terminal support
+
+### Phase 5: Database Management
+
+- One-click creation for MySQL, PostgreSQL, MariaDB, and Redis
+- Database and User CRUD operations
+- SQL console with syntax highlighting
+- SQLite browser for local database files
+
+### Phase 6: Backup + Monitoring
+
+- Kopia-based backup engine with Local, S3, WebDAV, and SFTP targets
+- Cron scheduling and retention policies
+- Real-time CPU, memory, disk, and network charts
+- Container resource monitoring
+- WebSocket-based metrics streaming
+- Alert rules with Webhook and Email notifications
+
+### Phase 7: App Store
+
+- Runtipi-compatible app catalog
+- One-click application install and management
+- Multi-source repository support
+- Project templates for quick scaffolding
+
+### Phase 8: MCP Server + API Token
+
+- 18 MCP tools for IDE integration
+- `wc_` prefixed API tokens with SHA-256 hashing
+- Cursor, Windsurf, and Claude Code IDE integration support
+
+### Phase 9: UX Polish
+
+- Sidebar simplified from 13 to 8 items
+- Settings page consolidation
+- Dashboard card layout redesign
+- i18n fixes and improvements
+
+### Security Hardening
+
+- AdminRouter JWT authentication
+- API Token RBAC authorization
+- MCP scope-based permissions
+- Path traversal protection
+- CORS strict origin matching
+- AI session isolation
+- WebSocket Origin header validation
+
+---
+
+## v0.5.1 (2026-02-23)
+
+- Fixed ALTCHA Proof-of-Work in HTTP (non-HTTPS) environments
+- Custom PowCaptcha component replacing Altcha Widget dependency
+- Bundle size reduced from 960KB to 895KB
+
+---
+
+## v0.5.0 (2026-02-23)
+
+- Replaced slider CAPTCHA with ALTCHA Proof-of-Work challenge
+- Improved login security without third-party CAPTCHA services
+
+---
+
+## v0.4.x (2026-02-23)
+
+### v0.4.4
+
+- Fixed `install.sh` GLIBC version detection on older distributions
+
+### v0.4.3
+
+- Fixed slider CAPTCHA rendering issues
+- Added GLIBC >= 2.32 runtime check
+
+### v0.4.2
+
+- Fixed Settings page crash on initial load
+- Fixed web font loading in offline environments
+
+### v0.4.1
+
+- Fixed Radix UI Themes v3 compatibility issues
+- Fixed `install.sh` pipe execution edge case
+
+### v0.4.0
+
+- Login rate limiting (failed attempt throttling)
+- Slider CAPTCHA for login protection
+- SSL/TLS certificate management UI
+- Server IP address settings
+- Theme system with CSS custom properties
+
+---
+
+## v0.3.x (2026-02-22)
+
+### v0.3.1
+
+- Unified version management via `VERSION` file at project root
+
+### v0.3.0
+
+- DNS Providers: Cloudflare, AliDNS, Tencent Cloud DNS, Route53
+- TLS modes: HTTP Challenge, DNS Challenge, Custom Certificate
+- Response compression (Gzip + Zstd)
+- CORS configuration
+- Security headers (HSTS, CSP, X-Frame-Options)
+- Custom error pages
+- Cache control rules
+- Static file and PHP hosting types
+- CodeMirror-based Caddyfile editor
+
+---
+
+## v0.2.1
+
+- Dashboard with server stats overview
+- Multi-user support with RBAC (admin/viewer roles)
+- Audit logging for all management actions
+- Custom Caddy directives in host configuration
+- Redirect host type
+- Custom SSL certificate upload
+- HTTP Basic Auth for protected hosts
+- One-click install script (`install.sh`)
+- Caddy process lifecycle management (start, stop, restart, reload)

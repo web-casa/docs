@@ -1,0 +1,104 @@
+---
+title: SSL/TLS Certificates
+description: Automatic certificate provisioning, custom uploads, and certificate management
+---
+
+Web.Casa leverages Caddy's built-in ACME client to provision and renew SSL/TLS certificates automatically. Every host can be configured with one of **six TLS modes** to match your deployment scenario.
+
+## TLS Modes
+
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| **Auto** | Obtains certificates from **Let's Encrypt** or **ZeroSSL** via ACME HTTP-01 / TLS-ALPN-01 challenge | Public-facing servers with ports 80/443 open |
+| **DNS Challenge** | Proves domain ownership via DNS TXT records using a configured DNS provider | Servers behind NAT/CDN/firewall |
+| **Wildcard (DNS)** | Issues a single certificate for `*.example.com` via DNS challenge | Multiple subdomains under one cert |
+| **Custom Certificate** | Uses your own uploaded `.pem`/`.crt` + `.key` files | Commercial CA certs, internal PKI |
+| **Off** | Serves the host over **HTTP only** -- no TLS | Local development, internal services |
+| **Internal** | Generates a **self-signed** certificate | Testing, internal tools behind VPN |
+
+## Auto Mode (Default)
+
+When you create a host with a public domain, Caddy automatically:
+
+1. Requests a certificate from **Let's Encrypt** (primary) or **ZeroSSL** (fallback).
+2. Completes the **HTTP-01** or **TLS-ALPN-01** challenge to prove domain ownership.
+3. Configures HTTPS for the host.
+4. **Renews** the certificate automatically before expiry.
+
+**Requirements:**
+
+- The domain's **A** (or **AAAA**) record must point to the server's IP
+- Port **80** and port **443** must be reachable from the internet
+- No CDN or proxy intercepting challenge requests (unless using DNS challenge)
+
+> Use the built-in **DNS Check** feature to verify your records before enabling a host.
+
+## DNS Challenge Mode
+
+For servers that cannot pass the HTTP-01 challenge -- behind NAT, CDN, or firewall -- use the **DNS Challenge** mode. This proves domain ownership by creating a DNS TXT record via your DNS provider's API.
+
+See [DNS Challenge & Wildcards](/reverse-proxy/dns-challenge/) for full setup instructions and supported providers.
+
+## Wildcard Certificates
+
+Wildcard certificates cover all subdomains under a domain (e.g., `*.example.com`). They **require** the DNS challenge mode.
+
+1. Set the host domain to `*.example.com`.
+2. Select **Wildcard (DNS)** as the TLS mode.
+3. Choose your configured DNS provider.
+4. Save -- Caddy handles the rest.
+
+> A wildcard certificate for `*.example.com` does **not** cover the bare domain `example.com`. Create a separate host for the bare domain if needed.
+
+## Custom Certificate Upload
+
+For certificates issued by a commercial CA or internal PKI:
+
+1. Navigate to the **Certificates** section in the panel.
+2. Click **Upload Certificate**.
+3. Provide the files:
+   - **Certificate file** -- `.pem` or `.crt` format (include the full chain)
+   - **Private key** -- `.key` file
+4. Web.Casa automatically parses the **domain names** and **expiration date** from the certificate.
+5. Link the certificate to one or more hosts.
+
+**Supported formats:**
+
+| File | Accepted Extensions |
+|------|-------------------|
+| Certificate / chain | `.pem`, `.crt` |
+| Private key | `.key` |
+
+> Always include the **full certificate chain** (your certificate + intermediate CA certificates) to avoid browser trust errors.
+
+## HTTP-Only Mode
+
+Set the TLS mode to **Off** to serve a host over plain HTTP. This disables all TLS handling for the host.
+
+> Only use this for local development or internal services that are not exposed to the internet. Traffic is **unencrypted**.
+
+## Internal (Self-Signed) Mode
+
+The **Internal** mode generates a self-signed certificate. Browsers will show a security warning, but the connection is still encrypted. Useful for:
+
+- Internal tools behind a VPN
+- Development and testing environments
+- Services where browser trust is not required
+
+## Certificate Management
+
+The **Certificates** dashboard provides a centralized view of all certificates:
+
+- **Domain names** covered by each certificate
+- **Issuer** (Let's Encrypt, ZeroSSL, custom CA, self-signed)
+- **Issuance date** and **expiration date**
+- Whether the certificate is **auto-managed** or **manually uploaded**
+
+**Available actions:**
+
+- View certificate details
+- Link or unlink certificates to hosts
+- Delete uploaded certificates
+- Monitor expiration dates
+
+> Web.Casa alerts you when a certificate is approaching its expiry date, giving you time to renew or replace it.

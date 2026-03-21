@@ -1,0 +1,83 @@
+---
+title: Quick Start
+description: Get up and running with Web.Casa in minutes
+---
+
+Follow these steps after completing [installation](/getting-started/installation/).
+
+## Step 1: Access the Panel
+
+Open your browser and navigate to:
+
+```
+http://YOUR_SERVER_IP:39921
+```
+
+Replace `YOUR_SERVER_IP` with your server's actual IP address or hostname.
+
+> If the page does not load, verify that port **39921** is open in your firewall and cloud security group.
+
+## Step 2: Create Your Admin Account
+
+On first visit, Web.Casa automatically redirects you to the **setup page**. Here you will:
+
+1. Set your **admin username**
+2. Set a **strong password**
+3. Click **Create Account**
+
+This creates the first administrator account with full privileges.
+
+> There is no default password. The first user to complete setup becomes the admin. Do this immediately after installation to prevent unauthorized access.
+
+## Step 3: Explore the Dashboard
+
+After logging in, the dashboard displays real-time server metrics:
+
+- **CPU** / **Memory** / **Disk** usage gauges
+- **Network** throughput (inbound and outbound)
+- Active site count and status
+- Docker container overview (if Docker is installed)
+
+The left sidebar provides access to all modules — **Sites**, **Docker**, **Database**, **Files**, **Terminal**, **Monitoring**, and more.
+
+## Step 4: Create Your First Reverse Proxy Host
+
+1. Click **Sites** in the left sidebar
+2. Click the **Add Site** button
+3. Select **Reverse Proxy** as the site type
+4. Fill in the configuration:
+
+| Field | Example Value | Description |
+|-------|--------------|-------------|
+| **Domain** | `app.example.com` | Your domain name |
+| **Upstream Address** | `127.0.0.1:3000` | Where your application listens |
+
+5. Click **Save**
+
+> Make sure your domain's **DNS A record** points to this server's IP address before saving. Caddy will automatically obtain an SSL certificate from Let's Encrypt — your site will be live with HTTPS within seconds.
+
+## Step 5: Enable HTTPS (Automatic)
+
+Web.Casa uses Caddy's built-in ACME client. HTTPS works automatically when:
+
+- Your domain's DNS resolves to the server's public IP
+- Ports **80** and **443** are open
+
+For **wildcard certificates**, go to **Settings > DNS Providers** and configure your DNS provider credentials (Cloudflare, AliDNS, Tencent Cloud DNS, or Route53).
+
+## Step 6: Strengthen Security
+
+We strongly recommend completing these security steps:
+
+1. **Enable TOTP 2FA** — Go to **Settings > Profile** and set up two-factor authentication
+2. **Review firewall rules** — Use the Firewall plugin to restrict access to trusted IPs
+3. **Set up audit logging** — Audit logs are enabled by default; review them under **Settings > Audit Log**
+
+## What's Next
+
+- **[Docker](/docker/container-management/)** — Manage containers and deploy Compose stacks
+- **[Database](/databases/mysql/)** — Create MySQL, PostgreSQL, or Redis instances
+- **[Backup](/backup/configuration/)** — Configure automated backup schedules
+- **[Terminal](/system/web-terminal/)** — Access your server shell directly from the browser
+- **[AI Assistant](/ai/setup/)** — Chat with LLMs for diagnostics and Compose generation
+- **[MCP Server](/ai/mcp-server/)** — Connect your AI IDE (Cursor, Windsurf, Claude Code) to manage the server

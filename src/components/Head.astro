@@ -1,0 +1,71 @@
+---
+const { head, slug, lang } = Astro.locals.starlightRoute;
+
+// Filter out problematic head elements:
+// - 404 page: remove hreflang alternates (locale variants don't exist) and canonical (points to /404/ which isn't a real page)
+// - All pages: remove Starlight's default favicon link (we inject our own comprehensive set below)
+const filteredHead = head.filter(({ tag, attrs }) => {
+  if (slug === '404' && tag === 'link' && attrs?.rel === 'alternate' && attrs?.hreflang) return false;
+  if (slug === '404' && tag === 'link' && attrs?.rel === 'canonical') return false;
+  if (slug === '404' && tag === 'meta' && attrs?.property === 'og:url') return false;
+  if (tag === 'link' && attrs?.rel === 'shortcut icon') return false;
+  return true;
+});
+
+// Locale-aware JSON-LD structured data
+const isZh = lang === 'zh-CN';
+
+const websiteJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: isZh ? 'Web.Casa 文档' : 'Web.Casa Documentation',
+  url: 'https://docs.web.casa',
+  description: isZh
+    ? 'Web.Casa 官方文档 — AI 原生的开源服务器管理面板，基于 Caddy 反向代理'
+    : 'Official documentation for Web.Casa — the AI-native open-source server panel powered by Caddy',
+  inLanguage: lang,
+  publisher: {
+    '@type': 'Organization',
+    name: 'Web.Casa',
+    url: 'https://web.casa',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://docs.web.casa/favicon.svg',
+    },
+  },
+});
+
+const softwareJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Web.Casa',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Linux',
+  url: 'https://web.casa',
+  downloadUrl: 'https://github.com/web-casa/webcasa',
+  license: 'https://opensource.org/licenses/MIT',
+  description: isZh
+    ? 'AI 原生的开源服务器管理面板，基于 Caddy 反向代理。73 个 AI 工具、44 个 MCP 工具、Docker 管理、Git 部署、MySQL/PostgreSQL/MariaDB/Redis 数据库管理等。'
+    : 'AI-native open-source server management panel powered by Caddy reverse proxy. 73 AI tools, 44 MCP tools, Docker management, Git deployment, MySQL/PostgreSQL/MariaDB/Redis database administration, and more.',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  author: {
+    '@type': 'Organization',
+    name: 'Web.Casa',
+    url: 'https://web.casa',
+  },
+});
+---
+
+{filteredHead.map(({ tag: Tag, attrs, content }) => <Tag {...attrs} set:html={content} />)}
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="WebCasa" />
+<link rel="manifest" href="/site.webmanifest" />
+<script type="application/ld+json" set:html={websiteJsonLd} />
+<script type="application/ld+json" set:html={softwareJsonLd} />

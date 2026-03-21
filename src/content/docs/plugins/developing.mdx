@@ -1,0 +1,162 @@
+---
+title: Developing Plugins
+description: Create custom plugins for Web.Casa with the plugin API, event bus, and config store
+---
+
+You can extend Web.Casa by developing custom plugins. A plugin is a Go package that implements the **Plugin interface** and is compiled into the Web.Casa binary.
+
+## Prerequisites
+
+- **Go** (version matching Web.Casa's go.mod)
+- Familiarity with the **Gin** web framework (used for routing)
+- **React** (for frontend components)
+- Understanding of the [Plugin System](/plugins/plugin-system/) architecture
+
+## Project Structure
+
+Create a directory under `internal/plugins/` with your plugin name:
+
+```
+internal/plugins/myplugin/
+  myplugin.go       # Plugin struct and lifecycle methods
+  handler.go        # HTTP handlers
+  service.go        # Business logic
+  model.go          # Database models
+```
+
+## Implementing the Plugin Interface
+
+Your plugin struct must implement these lifecycle methods:
+
+```go
+type MyPlugin struct {
+    core *core.API
+    db   *gorm.DB
+}
+
+func (p *MyPlugin) Info() core.PluginInfo {
+    return core.PluginInfo{
+        Name:         "myplugin",
+        Version:      "1.0.0",
+        Description:  "My custom plugin",
+        Dependencies: []string{"docker"}, // optional
+    }
+}
+
+func (p *MyPlugin) Init(api *core.API) error {
+    p.core = api
+    p.db = api.GetDB()
+    // Auto-migrate database tables
+    // Register event subscriptions
+    return nil
+}
+
+func (p *MyPlugin) Start() error {
+    // Start background processes
+    return nil
+}
+
+func (p *MyPlugin) Stop() error {
+    // Clean shutdown
+    return nil
+}
+
+func (p *MyPlugin) Uninstall() error {
+    // Remove database tables and clean up
+    return nil
+}
+```
+
+## Registering Routes
+
+Routes are registered using the **Gin router group** provided through the CoreAPI. Routes are mounted under `/api/v1/plugins/<plugin-name>/`:
+
+```go
+func (p *MyPlugin) RegisterRoutes(group *gin.RouterGroup) {
+    group.GET("/items", p.handleListItems)
+    group.POST("/items", p.handleCreateItem)
+    group.GET("/items/:id", p.handleGetItem)
+    group.PUT("/items/:id", p.handleUpdateItem)
+    group.DELETE("/items/:id", p.handleDeleteItem)
+}
+```
+
+Authentication and authorization middleware are automatically applied to plugin routes.
+
+## Event Bus
+
+### Publishing Events
+
+Notify other plugins when something happens:
+
+```go
+p.core.EventBus().Publish("myplugin.item.created", map[string]interface{}{
+    "id":   item.ID,
+    "name": item.Name,
+})
+```
+
+### Subscribing to Events
+
+React to events from other plugins or the core system:
+
+```go
+p.core.EventBus().Subscribe("container.started", func(payload interface{}) {
+    // Handle container start event
+})
+```
+
+**Common events to subscribe to:**
+
+| Event | Source | Payload |
+|-------|--------|---------|
+| `container.started` | Docker plugin | Container ID, name |
+| `container.stopped` | Docker plugin | Container ID, name |
+| `host.created` | Reverse Proxy | Host ID, domain |
+| `backup.completed` | Backup plugin | Backup ID, size |
+| `project.deployed` | Deploy plugin | Project ID, status |
+
+## Scoped Config Store
+
+Use the **ConfigStore** to persist plugin settings without direct database access:
+
+```go
+// Write a setting
+p.core.ConfigStore().Set("myplugin", "api_url", "https://example.com")
+
+// Read a setting
+value := p.core.ConfigStore().Get("myplugin", "api_url")
+```
+
+Settings stored in the ConfigStore are automatically exposed in the Web.Casa settings UI for user configuration.
+
+## CoreAPI Reference
+
+The CoreAPI provides access to shared system services:
+
+| Service | Access Method | Purpose |
+|---------|---------------|---------|
+| **Database** | `api.GetDB()` | GORM database connection |
+| **Event Bus** | `api.EventBus()` | Publish and subscribe to events |
+| **Config Store** | `api.ConfigStore()` | Scoped key-value settings |
+| **WebSocket** | `api.WebSocket()` | Real-time streaming to frontend |
+| **Logger** | `api.Logger()` | Structured logging |
+| **Auth Middleware** | `api.AuthMiddleware()` | Protect routes with authentication |
+
+## Registration
+
+After developing your plugin, register it in the plugin loader so Web.Casa discovers it at startup:
+
+```go
+// In the plugin registration file
+pluginManager.Register(&myplugin.MyPlugin{})
+```
+
+## Testing
+
+- Write unit tests for your service logic
+- Test HTTP handlers using Go's `httptest` package
+- Test event subscriptions by publishing mock events
+- Use existing built-in plugins as reference implementations
+
+> **Tip:** See the [Architecture Guide](/contributing/architecture-guide/) for detailed code structure conventions, naming patterns, and best practices.

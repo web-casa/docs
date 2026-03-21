@@ -1,0 +1,49 @@
+---
+title: Web Terminal
+description: Access a full terminal in your browser with xterm.js, multiple tabs, and PTY support
+---
+
+Web.Casa includes a **web-based terminal** providing full shell access directly from the browser. No separate SSH client is needed.
+
+## Core Features
+
+- Built on **xterm.js** with full ANSI color, Unicode, and mouse event support
+- Connects to a real **PTY** (pseudo-terminal) on the server
+- Interactive programs like `vim`, `htop`, `top`, and `nano` work correctly
+- **Copy and paste** via standard keyboard shortcuts
+- Text selection with the mouse for quick copying
+
+## Multi-Tab Support
+
+Open **multiple shell sessions** simultaneously, each running independently:
+
+- Every tab has its own session with separate working directory, shell history, and running processes
+- Create new tabs to run parallel tasks
+- Switch between tabs instantly
+- Each new tab opens with the system's default shell
+
+**Example workflow:**
+- **Tab 1** -- monitoring logs with `tail -f`
+- **Tab 2** -- editing configuration files
+- **Tab 3** -- running deployment commands
+
+## Window Controls
+
+- **Expand** the terminal to fullscreen for maximum workspace
+- **Restore** to the default panel size
+- Terminal **resizes dynamically** with the browser window -- PTY dimensions adjust automatically
+
+## Connection Details
+
+- Sessions stream over **WebSocket** for low-latency, real-time interaction
+- Automatic reconnection if the WebSocket connection drops
+- All input and output pass through a server-side PTY, ensuring accurate terminal emulation
+
+## Common Use Cases
+
+1. **Quick administration** -- run one-off commands without opening an SSH client
+2. **Log inspection** -- `tail -f /var/log/syslog` or `docker logs -f <container>`
+3. **Debugging** -- investigate issues requiring direct shell access
+4. **Service management** -- restart services, check process status, inspect configurations
+
+> **Tip:** Use multiple tabs to keep a log watcher open in one tab while working in another. This avoids interrupting long-running processes.

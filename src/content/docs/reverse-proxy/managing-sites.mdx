@@ -1,0 +1,147 @@
+---
+title: Managing Sites
+description: Create, edit, and manage reverse proxy hosts, upstreams, load balancing, headers, and access rules
+---
+
+All site management happens in the **Reverse Proxy** section of the Web.Casa panel. Changes are applied instantly through Caddy's Admin API with zero downtime.
+
+## Creating a Host
+
+1. Click **Add Host**.
+2. Select the **host type**: Reverse Proxy, Redirect, Static Website, or PHP Site.
+3. Enter the **domain name** (e.g., `app.example.com`).
+4. Configure type-specific settings (see sections below).
+5. Choose the **TLS mode** (defaults to Auto).
+6. Click **Save**.
+
+> You can also start from a **template** -- select one of the presets (WordPress, SPA, API, PHP-FPM, Static File Server, WebSocket) and Web.Casa will pre-fill the configuration for you.
+
+## Host Type Configuration
+
+### Reverse Proxy
+
+- **Upstream servers** -- One or more backend addresses in `host:port` format (e.g., `127.0.0.1:3000`, `backend:8080`)
+- **Load balancing** -- Traffic is distributed across upstreams using **Round Robin**
+- Supports HTTP and HTTPS upstream protocols
+
+### Redirect
+
+- **Target URL** -- The destination address visitors are sent to
+- **Status code** -- Choose **301** (permanent) or **302** (temporary)
+- The **original URI path** is automatically appended to the target URL
+
+### Static Website
+
+- **Root directory** -- Path to the folder containing your files (e.g., `/var/www/mysite`)
+- **Index files** -- Configurable index file names (e.g., `index.html`, `index.htm`)
+- **Directory browsing** -- Optional file listing when no index file is present
+
+### PHP Site
+
+- **Root directory** -- Path to the PHP application files
+- **FastCGI endpoint** -- Connect to PHP-FPM via `localhost:9000` or a **Unix socket** path
+- Suitable for WordPress, Laravel, and any PHP-FPM application
+
+## WebSocket Support
+
+Enable **WebSocket proxying** per host to pass WebSocket connections through to your upstream servers. This is essential for real-time applications such as chat, live dashboards, and collaborative editing tools.
+
+## Compression
+
+Enable response compression to reduce bandwidth and improve load times:
+
+- **Gzip** -- Widely supported by all browsers
+- **Zstd** -- Higher compression ratio with lower CPU usage (modern browser support)
+
+Both can be enabled simultaneously; Caddy negotiates the best encoding with each client.
+
+## Security Headers
+
+Add common security headers with a single toggle:
+
+| Header | Purpose |
+|--------|---------|
+| `X-Frame-Options` | Prevents clickjacking by controlling iframe embedding |
+| `X-Content-Type-Options` | Stops browsers from MIME-type sniffing |
+| `X-XSS-Protection` | Enables the browser's built-in XSS filter |
+
+## CORS (Cross-Origin Resource Sharing)
+
+Configure CORS rules per host:
+
+- **Allowed origins** -- Specify which domains can make cross-origin requests
+- **Allowed methods** -- `GET`, `POST`, `PUT`, `DELETE`, etc.
+- **Allowed headers** -- Custom headers the client may send
+
+> CORS settings are essential for API hosts consumed by frontend applications on different domains.
+
+## Custom Error Pages
+
+Replace Caddy's default error responses with your own HTML pages:
+
+- **404** -- Page not found
+- **500** -- Internal server error
+- Any other HTTP status code
+
+Upload or reference error page files, and Web.Casa configures Caddy to serve them automatically.
+
+## Custom Caddyfile Directives
+
+For advanced use cases not covered by the UI, inject **raw Caddyfile directives** directly into a host's configuration block. This gives you full access to Caddy's directive library.
+
+> Use this feature with caution -- invalid directives can break the host's configuration. Web.Casa validates syntax before applying.
+
+## HTTP Basic Auth
+
+Protect a host with username/password authentication:
+
+1. Enable **Basic Auth** in the host settings.
+2. Add one or more user accounts.
+3. Passwords are stored using **bcrypt** encryption.
+
+The browser will prompt visitors for credentials before granting access.
+
+## IP Access Control
+
+Restrict access to a host based on client IP address:
+
+- **Whitelist mode** -- Only the listed IPs/CIDRs are allowed access; all others are blocked
+- **Blacklist mode** -- The listed IPs/CIDRs are blocked; all others are allowed
+
+Addresses use **CIDR notation** (e.g., `192.168.1.0/24`, `10.0.0.1/32`, `2001:db8::/32`).
+
+## HTTP to HTTPS Redirect
+
+Enable **automatic HTTP to HTTPS redirect** per host. When enabled, all requests on port 80 are redirected to the HTTPS equivalent with a 301 status code.
+
+## Groups and Tags
+
+Organize your hosts for easier management:
+
+- **Groups** -- Assign hosts to named groups (e.g., "Production", "Staging", "Internal")
+- **Tags** -- Add freeform labels for filtering and searching
+
+Groups and tags appear in the host list and can be used to quickly filter large numbers of sites.
+
+## Host Cloning
+
+Duplicate an existing host configuration:
+
+1. Open the host you want to clone.
+2. Click **Clone**.
+3. Enter the new **domain name**.
+4. Adjust any settings as needed.
+5. Save the new host.
+
+All settings -- upstreams, TLS mode, headers, access rules -- are copied to the new host.
+
+## DNS Check
+
+Before going live, use the built-in **DNS Check** to verify that your domain's **A** and **AAAA** records point to the server's IP address. This helps catch DNS misconfigurations before they cause certificate issuance failures or downtime.
+
+## Editing and Deleting Hosts
+
+- Click any host in the list to open its settings and edit any field.
+- Changes take effect **immediately** -- no restart required.
+- **Deleting** a host removes it from both the database and Caddy's running configuration.
+- Use the **enable/disable toggle** to take a host offline temporarily without losing its configuration.

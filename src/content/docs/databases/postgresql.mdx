@@ -1,0 +1,107 @@
+---
+title: PostgreSQL
+description: Manage PostgreSQL instances, databases, users, and run queries through the Web.Casa panel
+---
+
+Web.Casa provides full lifecycle management for **PostgreSQL** through Docker-based instances. Create, configure, and administer PostgreSQL databases entirely from the web panel.
+
+## Instance Management
+
+Each PostgreSQL instance runs as an **isolated Docker container**.
+
+### Creating an Instance
+
+1. Navigate to **Databases** and click **Create Instance**.
+2. Select **PostgreSQL** as the engine.
+3. Configure the instance name and superuser password.
+4. Optionally select a **preset** (Development or Production).
+5. Click **Create** to spin up the container.
+
+### Instance Operations
+
+| Action | Description |
+|--------|-------------|
+| **Start** | Boot the container and accept connections |
+| **Stop** | Gracefully shut down the instance |
+| **Delete** | Remove the container and all associated data |
+
+> Deleting an instance is **irreversible**. Back up your databases before deleting.
+
+## Connection Info
+
+Each instance provides ready-to-use connection details in multiple formats:
+
+- **CLI command** -- `psql` command ready to paste into a terminal
+- **Connection URI** -- `postgresql://user:password@host:port/dbname` for application configs
+- **Environment variable** -- `DATABASE_URL=...` for `.env` files
+- **Docker internal address** -- for services running in the same Docker network
+
+## Database Operations
+
+### Creating a Database
+
+1. Open your PostgreSQL instance.
+2. Go to the **Databases** tab and click **Create Database**.
+3. Enter a database name.
+4. Configure **character set** options as needed.
+5. Click **Create**.
+
+### Dropping a Database
+
+Select a database from the list and click **Drop**. Confirm the action in the dialog.
+
+> Dropping a database permanently deletes all schemas, tables, and data within it.
+
+## User Management
+
+### Creating a User
+
+1. Go to the **Users** tab and click **Create User**.
+2. Set the **username** and **password**.
+3. Click **Create**.
+
+### Granting Database Access
+
+After creating a user, grant them access to one or more databases:
+
+1. Select the user from the list.
+2. Choose the target database(s).
+3. Click **Grant Access**.
+
+### Dropping a User
+
+Select a user and click **Drop** to remove them and revoke all associated privileges.
+
+## Query Console
+
+The built-in **SQL console** lets you execute queries against any PostgreSQL instance directly from the browser:
+
+- Write and run **SQL statements** with results displayed in a tabular format
+- Switch between instances and databases from a dropdown
+- View query execution time and row counts
+
+> The query console works across all PostgreSQL instances managed by Web.Casa.
+
+## Advanced Configuration
+
+Fine-tune instance performance through the **Settings** tab. You can also apply a **Development** or **Production** preset as a starting point.
+
+| Parameter | Description | Default (Dev) |
+|-----------|-------------|---------------|
+| **Shared Buffers** | Memory for caching data blocks | 128 MB |
+| **Work Mem** | Memory per query operation (sort, hash) | 4 MB |
+| **Effective Cache Size** | Planner's estimate of OS disk cache available | 512 MB |
+| **WAL Level** | Write-Ahead Log detail level (`minimal`, `replica`, `logical`) | `replica` |
+| **Slow Query Threshold** | Log queries exceeding this duration | Disabled |
+
+> **Production preset** increases shared buffers, work memory, and effective cache size for higher throughput under concurrent workloads. **Development preset** uses conservative resource limits suitable for local work.
+
+## SQLite Browser
+
+In addition to PostgreSQL instances, Web.Casa includes a built-in **SQLite browser** for inspecting local `.sqlite` / `.db` files:
+
+- **Open** any SQLite file from the server filesystem
+- **Browse** tables and data in **read-only mode**
+- **View schema** definitions (tables, columns, indexes)
+
+> The SQLite browser is read-only and does not modify the original file.

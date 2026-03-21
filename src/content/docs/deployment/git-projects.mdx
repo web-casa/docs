@@ -1,0 +1,134 @@
+---
+title: Git Projects
+description: Connect Git repositories, detect frameworks, and configure webhooks for deployment
+---
+
+The Deploy module lets you connect Git repositories and deploy applications directly from source code. Web.Casa supports multiple authentication methods, automatic framework detection, and webhook-based continuous deployment.
+
+---
+
+## Creating a New Project
+
+1. Navigate to **Deploy** in the sidebar.
+2. Click **New Project**.
+3. Enter the **Git repository URL** (HTTPS or SSH format).
+4. Select the **branch** to deploy.
+5. Configure authentication (see below).
+6. Click **Create**.
+
+Web.Casa clones the repository to the server, analyzes the project structure, and auto-detects the framework.
+
+---
+
+## Authentication Methods
+
+Web.Casa supports three authentication methods for private repositories:
+
+### SSH Key
+
+1. Select **SSH Key** as the authentication method.
+2. Web.Casa generates a deploy key or lets you provide your own.
+3. Add the **public key** to your Git hosting platform as a deploy key.
+4. Web.Casa uses the private key to authenticate when cloning and pulling.
+
+> SSH key authentication works with any Git hosting platform (GitHub, GitLab, Gitea, Bitbucket, etc.).
+
+### GitHub App
+
+1. Select **GitHub App** as the authentication method.
+2. Install the **Web.Casa GitHub App** on your GitHub account or organization.
+3. Grant access to the repositories you want to deploy.
+4. Web.Casa authenticates using the GitHub App installation token.
+
+**Benefits of GitHub App auth:**
+
+- **Fine-grained permissions** -- grant access to specific repositories only
+- **No personal tokens** -- authentication is tied to the app, not a user account
+- **Automatic token refresh** -- no manual token rotation needed
+
+### GitHub OAuth
+
+1. Select **GitHub OAuth** as the authentication method.
+2. Click **Connect with GitHub** to authorize Web.Casa.
+3. Select which repositories to grant access to.
+4. Web.Casa uses OAuth tokens to access your repositories.
+
+| Method | Platform Support | Best For |
+|--------|-----------------|----------|
+| **SSH Key** | Any Git host | Universal compatibility |
+| **GitHub App** | GitHub only | Organizations, fine-grained access |
+| **GitHub OAuth** | GitHub only | Quick personal setup |
+
+---
+
+## Framework Detection
+
+After cloning, Web.Casa automatically analyzes the repository and detects the framework. **9 frameworks** are currently supported:
+
+| Framework | Detection Method |
+|-----------|-----------------|
+| **Next.js** | `next` in `package.json` dependencies |
+| **Nuxt** | `nuxt` in `package.json` dependencies |
+| **Vite** | `vite` in `package.json` devDependencies |
+| **Create React App** | `react-scripts` in dependencies |
+| **Astro** | `astro` in `package.json` dependencies |
+| **Django** | `manage.py` and `requirements.txt` |
+| **Flask** | `flask` in `requirements.txt` |
+| **FastAPI** | `fastapi` in `requirements.txt` |
+| **Go** | `go.mod` in project root |
+
+Based on the detected framework, Web.Casa automatically suggests:
+
+- **Install command** (e.g., `npm install`, `pip install -r requirements.txt`)
+- **Build command** (e.g., `npm run build`)
+- **Start command** (e.g., `npm start`, `python manage.py runserver`)
+
+> You can override any auto-detected settings. Framework detection is a convenience feature, not a requirement.
+
+---
+
+## Auto Deploy (Webhooks)
+
+Enable automatic deployments triggered by Git pushes:
+
+1. In your project settings, find the **Auto Deploy** section.
+2. Copy the unique **Webhook URL** generated for your project.
+3. Add the URL as a webhook in your Git hosting platform:
+   - **GitHub** -- Settings > Webhooks > Add webhook
+   - **GitLab** -- Settings > Webhooks
+   - **Gitea** -- Settings > Webhooks
+4. Set the trigger event to **Push events**.
+
+When a push is detected on the configured branch:
+
+1. Web.Casa receives the webhook payload
+2. Pulls the latest code
+3. Runs the build pipeline
+4. Deploys the updated application
+
+> You can always trigger a **manual deployment** from the panel regardless of webhook configuration.
+
+---
+
+## Deployment History
+
+Each project maintains a complete deployment history:
+
+| Field | Description |
+|-------|-------------|
+| **Status** | Success, failed, or in progress |
+| **Commit** | Git commit hash and message |
+| **Duration** | Total build and deploy time |
+| **Triggered by** | Manual, webhook, or rollback |
+| **Timestamp** | When the deployment started |
+
+### Rollback
+
+To revert to a previous version:
+
+1. Open the **Deployments** tab in your project.
+2. Find the successful deployment you want to restore.
+3. Click **Rollback**.
+4. Web.Casa redeploys the application using that deployment's state.
+
+> Rollback creates a new deployment entry in the history, so you can always roll forward again if needed.

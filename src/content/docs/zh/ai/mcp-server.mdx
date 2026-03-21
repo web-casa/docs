@@ -1,0 +1,177 @@
+---
+title: MCP 服务器
+description: Model Context Protocol 服务器，44 个工具，API Token 管理和 IDE 配置
+---
+
+Web.Casa 实现了 **Model Context Protocol（MCP）** 服务器作为独立插件，对外暴露 **44 个工具**，让外部 AI 工具和 IDE 通过标准化接口与你的服务器交互。
+
+## 什么是 MCP
+
+**MCP（Model Context Protocol）** 是一种标准协议，将服务器管理能力以结构化工具的形式暴露给 AI 模型调用。将 MCP 兼容客户端连接到 Web.Casa 的 MCP 服务器后，AI 助手即可管理站点、容器、文件、数据库等 — 全部通过自然语言完成。
+
+## API Token 管理
+
+MCP 服务器的访问通过具有**基于范围权限**的 **API Token** 认证。
+
+### 创建 Token
+
+1. 进入 **设置 > MCP 服务器**
+2. 点击**创建 Token**
+3. 选择过期时间：
+
+| 过期时间 | 适用场景 |
+|---------|---------|
+| **30 天** | 短期测试或临时访问 |
+| **90 天** | 常规开发工作流 |
+| **180 天** | 长期运行的集成 |
+| **365 天** | 年度更新周期 |
+| **永不过期** | 持久集成（谨慎使用） |
+
+4. 立即复制完整 Token — 仅显示一次
+
+### Token 安全
+
+- Token 以 `wc_` 为前缀，便于识别
+- 以 **SHA-256 哈希**存储 — 原始 Token 仅在创建时显示一次
+- 每个 Token 跟踪**创建日期**、**过期时间**和**最后使用**时间戳
+- **权限范围**使用 `category:action` 格式（如 `hosts:write`、`deploy:read`）
+- 通配符 `*:*` 授予完全访问权限
+- 可在设置界面**立即撤销** Token
+
+> **提示：** 定期轮换 Token。如果 Token 可能已泄露，请立即撤销并创建新的。
+
+## MCP 端点
+
+```
+https://your-server.com/api/mcp
+```
+
+## IDE 配置
+
+### Cursor
+
+```json
+{
+  "mcpServers": {
+    "webcasa": {
+      "url": "https://your-server.com/api/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN"
+      }
+    }
+  }
+}
+```
+
+### Windsurf
+
+```json
+{
+  "mcpServers": {
+    "webcasa": {
+      "url": "https://your-server.com/api/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN"
+      }
+    }
+  }
+}
+```
+
+### Claude Code
+
+```json
+{
+  "mcpServers": {
+    "webcasa": {
+      "url": "https://your-server.com/api/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN"
+      }
+    }
+  }
+}
+```
+
+> **提示：** MCP 服务器设置页面中的配置代码片段已预填你的实际服务器 URL。直接复制后只需替换 Token 值即可。
+
+## 可用工具（共 44 个）
+
+### 站点管理
+- `list_hosts` — 列出所有反向代理站点
+- `create_host` — 创建新站点，配置域名、上游和 TLS
+- `update_host` — 更新上游、TLS 模式、WebSocket、压缩或启用状态
+- `delete_host` — 按 ID 删除站点
+- `toggle_host` — 启用或禁用站点
+
+### 项目部署
+- `list_projects` — 列出所有部署项目
+- `get_project` — 获取项目详情
+- `deploy_project` — 从 Git 创建项目并触发首次构建
+- `build_project` — 为现有项目触发新构建
+- `get_build_logs` — 获取项目构建日志
+- `auto_deploy` — 一条命令：Git URL → 项目 → 构建 → 反向代理 + HTTPS
+
+### Docker
+- `docker_ps` — 列出所有容器及状态、端口、资源使用
+- `docker_logs` — 获取容器日志
+- `docker_run` — 运行新容器，支持镜像、端口、卷、环境变量
+- `list_stacks` — 列出 Docker Compose Stack
+- `create_stack` — 从 YAML 创建 Compose Stack
+- `control_stack` — 启动、停止或重启 Stack
+- `get_stack_logs` — 获取 Stack 日志
+
+### 数据库
+- `list_db_instances` — 列出所有托管数据库实例
+- `create_db_instance` — 创建新数据库实例
+- `execute_query` — 执行只读 SQL 查询
+
+### 系统与文件
+- `get_system_metrics` — CPU、内存、磁盘使用率、负载
+- `get_system_info` — 主机名、操作系统、内核、运行时间、CPU 核数、架构
+- `run_command` — 执行带超时的 Shell 命令
+- `read_file` — 读取文件内容
+- `list_directory` — 列出文件和目录
+- `write_file` — 写入文件内容
+- `delete_file` — 删除文件
+
+### AI 驱动
+- `generate_compose` — 用自然语言生成 Docker Compose YAML
+- `diagnose_error` — AI 分析错误日志，定位根因并建议修复
+
+### 监控与告警
+- `list_alert_rules` — 列出所有告警规则
+- `create_alert_rule` — 创建监控告警规则
+- `get_alert_history` — 获取近期告警
+
+### 防火墙
+- `firewall_status` — 获取防火墙状态和活跃区域
+- `manage_firewall_rule` — 添加或删除端口或服务规则
+
+### 通知
+- `list_notify_channels` — 列出已配置的通知渠道
+
+### 备份
+- `trigger_backup` — 触发即时系统备份
+
+### 系统巡检
+- `run_inspection` — 运行健康巡检并生成 AI 分析报告
+
+### 应用商店
+- 搜索、安装和列出已安装应用
+
+### 计划任务
+- `list_cron_jobs` — 列出所有定时任务（可按标签筛选）
+- `get_cron_job_logs` — 获取执行日志
+- `create_cron_job` — 创建定时任务
+- `update_cron_job` — 更新任务设置
+- `delete_cron_job` — 删除任务
+- `trigger_cron_job` — 手动触发任务
+
+## 安全注意事项
+
+- 始终使用 **HTTPS** 作为 MCP 端点以保护传输中的 Token
+- 为不同客户端或团队成员创建独立的 Token
+- 使用**范围权限** — 仅授予每个客户端需要的类别
+- 监控**最后使用**时间戳以检测未使用或可能已泄露的 Token
+- 不再需要的 Token 应及时撤销

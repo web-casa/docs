@@ -1,0 +1,134 @@
+---
+title: Git 项目
+description: 连接 Git 仓库、自动检测框架并配置 Webhook 自动部署
+---
+
+部署模块支持连接 Git 仓库，直接从源代码部署应用。Web.Casa 提供多种认证方式、自动框架检测和基于 Webhook 的持续部署。
+
+---
+
+## 创建新项目
+
+1. 在侧边栏中进入 **部署** 模块。
+2. 点击 **新建项目**。
+3. 输入 **Git 仓库地址**（支持 HTTPS 或 SSH 格式）。
+4. 选择要部署的 **分支**。
+5. 配置认证方式（见下文）。
+6. 点击 **创建**。
+
+Web.Casa 将仓库克隆到服务器，分析项目结构并自动检测框架。
+
+---
+
+## 认证方式
+
+Web.Casa 支持三种私有仓库认证方式：
+
+### SSH 密钥
+
+1. 选择 **SSH 密钥** 作为认证方式。
+2. Web.Casa 生成部署密钥或允许你提供自己的密钥。
+3. 将 **公钥** 添加到 Git 平台作为部署密钥。
+4. Web.Casa 使用私钥在克隆和拉取时进行认证。
+
+> SSH 密钥认证适用于任何 Git 托管平台（GitHub、GitLab、Gitea、Bitbucket 等）。
+
+### GitHub App
+
+1. 选择 **GitHub App** 作为认证方式。
+2. 在你的 GitHub 账号或组织中安装 **Web.Casa GitHub App**。
+3. 授权需要部署的仓库。
+4. Web.Casa 使用 GitHub App 安装令牌进行认证。
+
+**GitHub App 认证的优势：**
+
+- **细粒度权限** -- 仅授权特定仓库的访问权限
+- **无需个人令牌** -- 认证绑定到应用而非用户账号
+- **自动令牌刷新** -- 无需手动轮换令牌
+
+### GitHub OAuth
+
+1. 选择 **GitHub OAuth** 作为认证方式。
+2. 点击 **连接 GitHub** 进行授权。
+3. 选择要授权访问的仓库。
+4. Web.Casa 使用 OAuth 令牌访问你的仓库。
+
+| 方式 | 平台支持 | 最佳场景 |
+|------|---------|---------|
+| **SSH 密钥** | 所有 Git 平台 | 通用兼容 |
+| **GitHub App** | 仅 GitHub | 组织、细粒度权限控制 |
+| **GitHub OAuth** | 仅 GitHub | 个人快速设置 |
+
+---
+
+## 框架检测
+
+克隆完成后，Web.Casa 自动分析仓库并检测框架。当前支持 **9 种框架**：
+
+| 框架 | 检测方式 |
+|------|---------|
+| **Next.js** | `package.json` 依赖中包含 `next` |
+| **Nuxt** | `package.json` 依赖中包含 `nuxt` |
+| **Vite** | `package.json` devDependencies 中包含 `vite` |
+| **Create React App** | 依赖中包含 `react-scripts` |
+| **Astro** | `package.json` 依赖中包含 `astro` |
+| **Django** | 存在 `manage.py` 和 `requirements.txt` |
+| **Flask** | `requirements.txt` 中包含 `flask` |
+| **FastAPI** | `requirements.txt` 中包含 `fastapi` |
+| **Go** | 项目根目录存在 `go.mod` |
+
+基于检测到的框架，Web.Casa 自动推荐：
+
+- **安装命令**（如 `npm install`、`pip install -r requirements.txt`）
+- **构建命令**（如 `npm run build`）
+- **启动命令**（如 `npm start`、`python manage.py runserver`）
+
+> 你可以覆盖任何自动检测的设置。框架检测是便捷功能，并非强制要求。
+
+---
+
+## 自动部署（Webhook）
+
+启用由 Git 推送触发的自动部署：
+
+1. 在项目设置中找到 **自动部署** 部分。
+2. 复制为项目生成的唯一 **Webhook URL**。
+3. 在 Git 平台中添加该 URL 作为 Webhook：
+   - **GitHub** -- Settings > Webhooks > Add webhook
+   - **GitLab** -- Settings > Webhooks
+   - **Gitea** -- Settings > Webhooks
+4. 将触发事件设为 **Push 事件**。
+
+当检测到配置分支的推送时：
+
+1. Web.Casa 接收 Webhook 请求
+2. 拉取最新代码
+3. 执行构建流水线
+4. 部署更新后的应用
+
+> 无论是否配置了 Webhook，你都可以随时从面板触发 **手动部署**。
+
+---
+
+## 部署历史
+
+每个项目维护完整的部署历史记录：
+
+| 字段 | 说明 |
+|------|------|
+| **状态** | 成功、失败或进行中 |
+| **提交** | Git 提交哈希和提交信息 |
+| **耗时** | 构建和部署的总时间 |
+| **触发方式** | 手动、Webhook 或回滚 |
+| **时间** | 部署开始时间 |
+
+### 回滚
+
+回退到之前的版本：
+
+1. 打开项目的 **部署记录** 标签页。
+2. 找到要恢复的成功部署记录。
+3. 点击 **回滚**。
+4. Web.Casa 使用该部署的状态重新部署应用。
+
+> 回滚操作会在历史记录中创建一条新的部署记录，因此你可以随时再次前滚。

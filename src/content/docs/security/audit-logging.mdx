@@ -1,0 +1,55 @@
+---
+title: Audit Logging
+description: Track all operations with action type, target, detail, IP address, timestamp, and user information
+---
+
+Web.Casa maintains a comprehensive **audit log** that automatically records every significant operation performed in the panel. The audit log provides accountability, traceability, and security monitoring.
+
+## What Gets Logged
+
+Every action that creates, modifies, or deletes a resource generates a log entry, including:
+
+- **User management** -- account creation, role changes, password resets, deletion
+- **Host operations** -- create, update, delete reverse proxy hosts
+- **DNS provider changes** -- add, edit, remove DNS providers
+- **Certificate actions** -- issue, renew, revoke certificates
+- **Docker operations** -- container start, stop, restart, remove
+- **Database operations** -- create, delete databases and users
+- **Backup & restore** -- backup creation, restore execution
+- **Firewall changes** -- rule additions, modifications, removals
+- **System settings** -- configuration changes, Caddy reloads
+- **Authentication events** -- successful logins, failed login attempts, 2FA events
+
+## Log Entry Fields
+
+Each audit log entry contains the following fields:
+
+| Field | Description |
+|-------|-------------|
+| **Action** | The type of operation performed (e.g., `create`, `update`, `delete`, `login`) |
+| **Target** | The resource or entity affected by the action |
+| **Detail** | Additional context about the operation |
+| **IP Address** | The source IP address of the user who performed the action |
+| **Time** | Timestamp of when the action occurred |
+| **User** | The username of the account that performed the action |
+
+## Viewing and Filtering Logs
+
+The audit log interface in the panel provides:
+
+- **Filter by action type** -- narrow results to specific operations (e.g., only `delete` actions)
+- **Total count display** -- shows the total number of matching log entries
+- **Chronological listing** -- entries displayed in reverse chronological order
+- **Paginated navigation** -- browse through large log histories
+
+## Access
+
+- **Admin** users can view the full audit log
+- **Viewer** users can view audit logs in read-only mode
+- Audit log entries **cannot be modified or deleted** through the panel interface
+
+## Storage
+
+Audit log data is stored in the **SQLite database** alongside other panel data at `/var/lib/webcasa/webcasa.db`. The audit log is included when you use the panel's export functionality.
+
+> **Tip:** For environments with compliance requirements, regularly export your audit logs for archival. Use **Settings > Export** to create a full backup that includes audit data.

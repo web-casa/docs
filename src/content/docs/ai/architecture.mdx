@@ -1,0 +1,164 @@
+---
+title: AI Architecture
+description: How AI is deeply integrated into Web.Casa as a native capability
+---
+
+Web.Casa's AI is not a plugin bolted on top — it's a native layer that connects to every subsystem in the panel. This page explains the architecture behind the AI assistant and MCP server.
+
+## Overview
+
+The AI system has two interfaces:
+
+1. **Built-in Chat** — a conversational UI inside the Web.Casa panel with **73 tools**
+2. **MCP Server** — a dedicated plugin exposing **44 tools** that external AI clients (Cursor, Windsurf, Claude Code) connect to
+
+Both interfaces share the same security model and execution pipeline. The MCP server exposes a curated subset of the AI assistant's full tool set.
+
+```
+┌─────────────────────────────────────────────────┐
+│                  AI Interfaces                   │
+│  ┌──────────────────┐  ┌──────────────────────┐  │
+│  │  Built-in Chat   │  │  MCP Server (HTTP)   │  │
+│  │  (Panel UI)      │  │  Cursor / Windsurf / │  │
+│  │                  │  │  Claude Code          │  │
+│  └────────┬─────────┘  └──────────┬───────────┘  │
+│           │                       │               │
+│           ▼                       ▼               │
+│  ┌────────────────────────────────────────────┐  │
+│  │            Tool Execution Layer             │  │
+│  │  73 AI Tools → Confirmation → Execute       │  │
+│  └────────────────────┬───────────────────────┘  │
+│                       │                           │
+│                       ▼                           │
+│  ┌────────────────────────────────────────────┐  │
+│  │           Web.Casa Core Services            │  │
+│  │  Host │ Docker │ Deploy │ Database │ ...    │  │
+│  └────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────┘
+```
+
+## Tool Calling Flow
+
+When a user sends a message, the following pipeline executes:
+
+1. **User Input** — natural language request (chat or MCP)
+2. **LLM Reasoning** — the model determines which tools to call and with what parameters
+3. **Tool Call** — the AI selects from 73 available tools (e.g., `create_host`, `docker_ps`, `deploy_project`, `run_inspection`)
+4. **Confirmation Dialog** — for operations that modify server state, a dialog shows exactly what will be executed
+5. **Execution** — upon approval, the tool runs against the corresponding Web.Casa service
+6. **Result** — the outcome is returned to the LLM, which formulates a human-readable response
+
+```
+User ──▶ LLM ──▶ Tool Selection ──▶ Confirmation ──▶ Execute ──▶ Result ──▶ Response
+          ▲                                                         │
+          └─────────────────── feedback loop ───────────────────────┘
+```
+
+The LLM can chain multiple tool calls in sequence. For example, diagnosing a 502 error might involve: `get_host` → `docker_ps` → `docker_logs` → `get_system_metrics` → synthesize findings.
+
+## MCP Protocol
+
+Web.Casa implements the **Model Context Protocol (MCP)** using HTTP Streamable transport:
+
+| Layer | Implementation |
+|-------|---------------|
+| **Transport** | HTTP Streamable (SSE for streaming responses) |
+| **Authentication** | Bearer token (`wc_` prefixed API tokens) |
+| **Authorization** | Scope-based — tokens inherit the creating user's permissions |
+| **Endpoint** | `https://your-server.com/api/mcp` |
+
+The MCP server exposes **44 tools** — a curated subset of the 73 AI tools. External clients discover available tools through the MCP protocol's tool listing capability, then invoke them with structured parameters.
+
+## Security Model
+
+AI operations follow a layered security approach:
+
+### Operation Classification
+
+| Category | Examples | Requires Confirmation |
+|----------|---------|----------------------|
+| **Read-only** | `list_hosts`, `docker_ps`, `get_system_metrics` | No |
+| **Mutating** | `create_host`, `deploy_project`, `run_command` | Yes |
+| **Destructive** | `delete_file`, container removal | Yes (with warning) |
+
+### Confirmation Dialog
+
+Before any mutating operation executes, Web.Casa presents a confirmation dialog that shows:
+- The tool being called
+- All parameters (domain, command, file path, etc.)
+- A clear description of what will happen
+
+The user must explicitly approve before execution proceeds. This applies to both the built-in chat and MCP-initiated operations.
+
+### Session Isolation
+
+Each AI conversation runs in an isolated session:
+- Conversation history is not shared between sessions
+- Memory (persistent context) is user-scoped
+- API tokens for MCP access are independently scoped and revocable
+
+### Token Security
+
+- API tokens are prefixed with `wc_` for easy identification
+- Tokens are stored as SHA-256 hashes — the raw token is shown only once at creation
+- Each token tracks creation date, expiry, and last-used timestamp
+- Tokens can be revoked immediately from the settings UI
+
+## Memory System
+
+The AI assistant supports **persistent memory** across conversations:
+
+| Tool | Purpose |
+|------|---------|
+| `save` | Store a key-value pair for future reference |
+| `search` | Find previously saved context by keyword |
+| `list` | View all saved memory entries |
+| `delete` | Remove a memory entry |
+
+This allows the AI to remember project-specific context, deployment preferences, and recurring configurations across sessions. Memory is scoped to the authenticated user.
+
+## Embedding & Semantic Search
+
+When an **embedding model** is configured, the AI gains semantic search capabilities:
+
+1. Server context (host configurations, project metadata, recent logs) is embedded into vector representations
+2. When a user asks a question, the query is embedded and compared against stored vectors
+3. The most relevant context is retrieved and included in the LLM prompt
+
+This enables the AI to answer questions like "which of my sites had errors last week?" without needing to scan every log file in real time.
+
+Supported embedding providers: **OpenAI** (text-embedding-3-small/large, ada-002) and **Zhipu** (embedding-3, embedding-2).
+
+## Self-Healing Engine
+
+The **SelfHealEngine** provides automated incident response:
+
+1. A monitoring alert fires (e.g., CPU > 90% for 5 minutes)
+2. The `monitoring.alert.fired` event propagates via **EventBus**
+3. The SelfHealEngine picks up the event and analyzes the situation using AI
+4. It suggests remediation actions (restart a container, free disk space, etc.)
+5. A **5-minute cooldown** prevents alert storms from triggering excessive analysis
+
+This turns reactive monitoring into proactive operations — the AI doesn't just report problems, it proposes solutions.
+
+## System Health Inspection
+
+The `run_inspection` tool performs a comprehensive audit:
+
+- **Disk usage** — identifies partitions approaching capacity
+- **Memory pressure** — detects swap usage and OOM risk
+- **Container health** — checks for crashed, restarting, or unhealthy containers
+- **SSL certificates** — warns about upcoming expirations
+- **Configuration issues** — validates host and Caddy configurations
+
+Results are stored as `InspectionRecord` entries and include an AI-generated summary with prioritized recommendations. Daily scheduled inspections can be enabled via settings.
+
+## Event-Driven Automation
+
+The AI system integrates with Web.Casa's **EventBus** for automated responses:
+
+| Event | Automated Action |
+|-------|-----------------|
+| `deploy.build.failed` | AI auto-diagnoses build logs and suggests fixes |
+| `monitoring.alert.fired` | SelfHealEngine analyzes and suggests remediation |
+| User triggers `run_inspection` | AI generates health summary report |

@@ -1,0 +1,109 @@
+---
+title: AI Use Cases
+description: Real-world examples of how the AI assistant accelerates server management
+---
+
+Web.Casa's AI assistant isn't a chatbot bolted onto a panel — it's a co-pilot wired into every subsystem. Here are real scenarios showing how it replaces multi-step manual workflows with a single natural-language request.
+
+## Create a Reverse Proxy in One Sentence
+
+**Without AI:** Open the site creation form, fill in domain, select type, enter upstream address, configure headers, save, wait for certificate issuance.
+
+**With AI:**
+
+> "Create a reverse proxy for api.example.com pointing to localhost:3000 with HTTPS"
+
+The AI calls `create_host`, configures the upstream, and Caddy provisions the TLS certificate automatically. You review the confirmation dialog and approve — done.
+
+## Deploy a Docker App from a Description
+
+**Without AI:** Write a `docker-compose.yml` by hand, manage environment variables, create volumes and networks, then start the stack.
+
+**With AI:**
+
+> "Deploy a WordPress site with MySQL and Redis caching"
+
+The AI generates a complete Compose file with correct image versions, environment variables, volume mounts, and network configuration. After your approval, it deploys the stack and reports the access URL.
+
+## Diagnose a 502 Error
+
+**Without AI:** SSH into the server, check Caddy logs, check upstream container status, inspect port bindings, review recent deployments, correlate timestamps.
+
+**With AI:**
+
+> "My site blog.example.com is returning 502, help me investigate"
+
+The AI runs `get_host` to check the proxy configuration, `docker_ps` to verify the upstream container is running, `docker_logs` to scan for errors, and `get_system_metrics` to check resource usage. It then explains the root cause — for example, the container crashed due to an OOM kill — and suggests a fix.
+
+## Manage Your Server from Your IDE
+
+With **44 MCP tools** exposed via the Model Context Protocol, your AI-powered IDE becomes a server management interface:
+
+**In Cursor / Windsurf / Claude Code:**
+
+> "Show me all running containers and their resource usage"
+
+The IDE calls `docker_ps` and `get_system_metrics` through MCP, displaying results inline. No browser tab, no SSH — just your editor.
+
+**More MCP workflows:**
+- "Deploy the latest commit of my-app" → triggers `deploy_project`
+- "What's in the build log for the last failed deploy?" → calls `get_build_log`
+- "Create a PostgreSQL database called analytics" → invokes database creation tools
+- "Back up everything to S3 right now" → triggers `trigger_backup`
+
+## AI-Powered Code Review
+
+**Without AI:** Manually review code before deployment, check for hardcoded secrets, missing error handling, SQL injection vectors.
+
+**With AI:**
+
+> "Review the code in my latest commit for security issues"
+
+The AI calls `review_code` to analyze your changes, checking for:
+- Hardcoded credentials or API keys
+- SQL injection and XSS vulnerabilities
+- Missing input validation
+- Performance anti-patterns
+
+It returns a structured report with severity levels and suggested fixes — before the code reaches production.
+
+## Generate a Dockerfile from Project Context
+
+**Without AI:** Analyze the project structure, identify the language/framework, determine the correct base image, write multi-stage builds, configure build arguments.
+
+**With AI:**
+
+> "Generate a Dockerfile for this Next.js project with standalone output"
+
+The AI calls `generate_dockerfile`, inspects the project's `package.json`, framework configuration, and directory structure, then produces an optimized multi-stage Dockerfile with the correct Node.js version, build steps, and production configuration.
+
+## Automated System Health Check
+
+**Without AI:** Manually check disk space, review container status, verify SSL certificates, scan logs for errors across multiple services.
+
+**With AI:**
+
+> "Run a system health inspection"
+
+The AI calls `run_inspection`, which checks disk usage, memory pressure, container health, SSL certificate expiration, and configuration validity. It returns an AI-generated summary with prioritized recommendations — all in one command.
+
+## Self-Healing on Alert
+
+**Without AI:** Get paged at 3 AM, SSH in, diagnose the alert, take manual action.
+
+**With AI:** When a monitoring alert fires (e.g., "disk usage > 90%"), the **SelfHealEngine** automatically:
+1. Analyzes the alert context
+2. Identifies the cause (Docker image cache bloat, log rotation failure, etc.)
+3. Suggests a fix (`docker_prune` or adjust log retention)
+
+You review and approve — or let it auto-remediate based on your configured policy.
+
+## One-Command Full Deployment
+
+**Without AI:** Create a project, configure Git, detect framework, set up build pipeline, create reverse proxy, enable HTTPS — at least 6 steps.
+
+**With AI:**
+
+> "Deploy https://github.com/my-org/my-app to myapp.example.com"
+
+The AI calls `auto_deploy`: clones the repo, detects the framework, triggers the build, creates the reverse proxy host, and provisions HTTPS — all in one command.

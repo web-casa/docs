@@ -1,0 +1,184 @@
+---
+title: AI Assistant Setup
+description: Configure the built-in AI assistant with 6 natively supported LLM providers
+---
+
+Web.Casa includes a built-in **AI assistant** with **73 tools** that can manage your server, diagnose issues, generate configurations, review code, run system health inspections, and auto-heal problems. It natively supports three API protocols, covering six major LLM providers.
+
+> **Warning:** The AI assistant can execute real actions on your server (deploying projects, running commands, managing containers). A **confirmation dialog** is shown before risky operations, but you should still review each action carefully.
+
+## Provider Presets
+
+Web.Casa natively supports **6 providers** with **3 API protocols**:
+
+| Provider | API Format | Base URL | Models |
+|----------|-----------|----------|--------|
+| **OpenAI** | `openai-chat` | `https://api.openai.com` | gpt-4o, gpt-4o-mini, o3-mini |
+| **Anthropic** | `anthropic-messages` | `https://api.anthropic.com` | claude-sonnet-4-20250514, claude-haiku-4-20250414 |
+| **Google Gemini** | `google-generativeai` | `https://generativelanguage.googleapis.com` | gemini-2.0-flash, gemini-2.5-pro |
+| **DeepSeek** | `openai-chat` | `https://api.deepseek.com` | deepseek-chat, deepseek-reasoner |
+| **Moonshot (Kimi)** | `openai-chat` | `https://api.moonshot.cn` | moonshot-v1-8k, moonshot-v1-32k, moonshot-v1-128k |
+| **Zhipu (智谱)** | `openai-chat` | `https://open.bigmodel.cn/api/paas` | glm-4-flash, glm-4 |
+
+Any **OpenAI-compatible** endpoint (Ollama, LM Studio, vLLM) also works by selecting the `openai-chat` format and entering a custom base URL.
+
+## Configuration
+
+1. Navigate to **Settings > AI**
+2. Select a **provider preset** or choose custom
+3. The **API format** is auto-selected based on the provider
+4. Enter the **Base URL** for the API endpoint
+5. Enter your **API Key** (encrypted with AES-GCM at rest)
+6. Select the **Model** to use
+7. Save settings and test the connection
+
+> **Tip:** API keys are encrypted at rest and never exposed in the UI after saving.
+
+### Embedding Model (Optional)
+
+For **semantic search** and vector-based memory retrieval, you can configure a separate embedding model:
+
+| Provider | Models |
+|----------|--------|
+| **OpenAI** | text-embedding-3-small, text-embedding-3-large, text-embedding-ada-002 |
+| **Zhipu** | embedding-3, embedding-2 |
+
+You can optionally provide separate credentials for the embedding endpoint (Base URL + API Key). If not specified, the main provider's credentials are used as fallback.
+
+## Chat Interface
+
+The AI assistant is accessible through a **chat panel** in the Web.Casa UI:
+
+- **Conversation history** — previous messages are maintained within the session
+- **Fullscreen mode** — expand the chat to full screen for complex interactions
+- **Ctrl+Enter** to send messages
+- Clear conversation history at any time
+
+## Tools (73 Total)
+
+The AI assistant has access to **73 tools** organized in 17 categories:
+
+### Host Management (7 tools)
+- `list_hosts` — list all reverse proxy hosts
+- `get_host` — get details of a specific host
+- `create_host` — create a new reverse proxy host
+- `update_host` — modify an existing host
+- `delete_host` — remove a host permanently
+- `toggle_host` — enable or disable a host
+- `clone_host` — duplicate a host configuration to a new domain
+
+### Project Deployment (10 tools)
+- `list_projects` — list all deployed projects
+- `get_project` — get project details
+- `create_project` — create a new project from a Git repository
+- `deploy_project` — trigger a build and deployment
+- `get_build_log` — retrieve build logs
+- `get_runtime_log` — retrieve runtime logs
+- `start_project` / `stop_project` — start or stop a project
+- `rollback_project` — rollback to a specific build number
+- `auto_deploy` — one-command: Git URL → project creation → framework detection → build → reverse proxy with HTTPS
+
+### Docker Operations (10 tools)
+- `docker_ps` — list all containers with status
+- `docker_logs` — view container logs
+- `docker_list_stacks` — list Compose stacks
+- `docker_manage_container` — start, stop, or restart a container
+- `docker_run_container` — create and run a new container
+- `docker_pull_image` — pull an image from a registry
+- `docker_get_container_stats` — real-time CPU/memory/network/IO stats
+- `docker_remove_container` — remove a container
+- `docker_prune` — clean up unused resources (containers, images, volumes, or all)
+
+### Database Operations (5 tools)
+- `database_list_instances` — list MySQL, PostgreSQL, MariaDB, Redis instances
+- `database_create_instance` — create a new database instance in Docker
+- `database_create_database` — create a logical database
+- `database_create_user` — create a database user with access grants
+- `database_execute_query` — execute read-only SQL queries (SELECT, SHOW, DESCRIBE, EXPLAIN)
+
+### File Management (5 tools)
+- `read_file` — read file contents (restricted to safe directories)
+- `list_dir` — list directory contents with metadata
+- `write_file` — create or overwrite a file (max 1MB)
+- `delete_file` — delete a file or directory
+- `rename_file` — rename or move a file
+
+### System & Metrics (3 tools)
+- `get_system_metrics` — current CPU, memory, disk usage
+- `get_system_info` — hostname, OS, kernel, uptime, CPU cores, architecture
+- `run_command` — execute a shell command (dangerous commands are blocked)
+
+### AI-Powered Diagnostics (6 tools)
+- `suggest_env_vars` — recommend environment variables for a framework
+- `generate_dockerfile` — generate optimized, production-ready Dockerfiles
+- `diagnose_runtime` — AI-analyze runtime logs for errors and performance issues
+- `review_code` — security, performance, and best practices code review
+- `suggest_rollback` — analyze deployment history and recommend rollback
+- `summarize_alerts` — AI summary of recent monitoring alerts with root cause analysis
+
+### Memory (4 tools)
+- `save_memory` — store persistent facts for future conversations
+- `search_memory` — search memory by keyword (with optional vector retrieval)
+- `list_memories` — list stored memories with pagination
+- `delete_memory` — remove a memory entry
+
+### Firewall (3 tools)
+- `firewall_status` — get firewalld status, zones, and active rules
+- `list_firewall_rules` — list port, service, and rich rules for a zone
+- `manage_firewall_rule` — add or remove firewall rules
+
+### PHP (2 tools)
+- `php_list_runtimes` — list installed PHP runtimes (FPM + FrankenPHP)
+- `php_list_sites` — list PHP websites with version and runtime info
+
+### Caddy Management (3 tools)
+- `caddy_status` — Caddy version, running state, config path
+- `caddy_restart` — restart Caddy
+- `caddy_reload` — reload configuration without downtime
+
+### Notification Channels (2 tools)
+- `list_notify_channels` — list configured channels (Webhook, Email, Discord, Telegram)
+- `test_notify_channel` — send a test message
+
+### Monitoring Alert Rules (3 tools)
+- `list_alert_rules` — list all alert rules and their status
+- `create_alert_rule` — create a threshold-based alert (e.g., CPU > 90% for 5 min)
+- `delete_alert_rule` — remove an alert rule
+
+### App Store (3 tools)
+- `appstore_search_apps` — search available applications
+- `appstore_install_app` — one-click app installation via Docker
+- `appstore_list_installed` — list installed applications
+
+### Backup (1 tool)
+- `trigger_backup` — trigger an immediate system backup
+
+### System Inspection (1 tool)
+- `run_inspection` — comprehensive health check: disk, memory, containers, SSL certificates, and AI-powered summary report
+
+### Cron Job Management (6 tools)
+- `list_cron_jobs` — list all scheduled jobs (optional tag filter)
+- `get_cron_job_logs` — get execution logs for a job
+- `create_cron_job` — create a scheduled job (standard 5-field cron format)
+- `update_cron_job` — update job settings
+- `delete_cron_job` — delete a job and its logs
+- `trigger_cron_job` — manually run a job immediately
+
+## Key Capabilities
+
+### System Health Inspection
+The AI can run a comprehensive system audit checking disk usage, memory pressure, container health, SSL certificate expiration, and configuration issues. Results include an AI-generated summary with prioritized recommendations.
+
+### Self-Healing Engine
+When monitoring alerts fire, the AI's **SelfHealEngine** automatically analyzes the situation and suggests remediation actions. This is rate-limited (5-minute cooldown) and integrates with the monitoring alert system via EventBus.
+
+### Auto-Diagnosis on Build Failure
+When a project build fails (`deploy.build.failed` event), the AI automatically analyzes the build logs and provides a diagnosis with suggested fixes — no manual intervention needed.
+
+### Compose Generation
+Describe the application you want to deploy in natural language, and the AI generates a complete `docker-compose.yml`:
+
+> "Set up a WordPress site with MySQL and Redis caching"
+
+### Confirmation Dialog
+Operations that modify your server trigger a **confirmation dialog** showing exactly what will be executed. You must approve before the action proceeds.

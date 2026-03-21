@@ -1,0 +1,93 @@
+---
+title: Architecture
+description: How Web.Casa's Go backend, React frontend, SQLite database, Caddy subprocess, and plugin system fit together
+---
+
+Web.Casa follows a layered architecture with clear separation between the API, business logic, data, and UI layers.
+
+## System Overview
+
+```
+┌─────────────────────────────────────────────┐
+│           Browser (React 19 SPA)            │
+│   Vite 7 · Radix UI Themes 3 · Zustand 5   │
+│           Tailwind CSS v4                   │
+└──────────────┬──────────────────────────────┘
+               │  REST API (HTTP)
+               │  WebSocket (terminal, metrics, logs)
+┌──────────────▼──────────────────────────────┐
+│         Go Backend (Gin + GORM)             │
+│  ┌──────────┐ ┌──────────┐ ┌─────────────┐ │
+│  │ Handler  │ │ Service  │ │   Model     │ │
+│  │  layer   │→│  layer   │→│   layer     │ │
+│  └──────────┘ └──────────┘ └─────────────┘ │
+│  ┌──────────────────────────────────────┐   │
+│  │     Plugin System (12 plugins)       │   │
+│  └──────────────────────────────────────┘   │
+└──────┬──────────────────────┬───────────────┘
+       │                      │
+┌──────▼──────┐    ┌──────────▼──────────┐
+│   SQLite    │    │   Caddy subprocess  │
+│ (WAL mode)  │    │  (managed via       │
+│             │    │   admin API)        │
+└─────────────┘    └─────────────────────┘
+```
+
+## Backend
+
+- Built with **Go** using the **Gin** HTTP framework
+- Data persistence through **GORM** ORM with **SQLite** in **WAL mode**
+- SQLite stores all panel configuration, user accounts, host definitions, audit logs, and plugin state
+- Database location: **`/var/lib/webcasa/webcasa.db`**
+
+> **Key design choice:** Caddy runs as a **managed subprocess**. Web.Casa communicates with Caddy through its admin API to apply configuration changes dynamically -- no process restarts needed.
+
+## Frontend
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **React** | 19 | UI framework |
+| **Vite** | 7 | Build tool and dev server |
+| **Radix UI Themes** | 3 | Component library |
+| **Tailwind CSS** | v4 | Utility-first styling |
+| **Zustand** | 5 | State management |
+
+- Compiled into **static assets** and served directly by the Go binary
+- No separate web server required for the frontend
+- Single-page application with client-side routing
+
+## Real-Time Communication
+
+WebSocket connections handle features requiring persistent, bidirectional data flow:
+
+- **Terminal** -- PTY sessions via xterm.js
+- **Monitoring** -- CPU, memory, disk, and network metrics streaming
+- **Deploy** -- build log streaming during Git deployments
+- **Docker** -- container log tailing
+
+## Plugin System
+
+Web.Casa uses a plugin architecture to organize feature modules. Each plugin implements a standard **Plugin interface** and communicates with the core system through an event bus.
+
+**12 built-in plugins:**
+
+| Plugin | Function |
+|--------|----------|
+| Docker | Container and Compose management |
+| Database | MySQL/PostgreSQL management |
+| Backup | Scheduled and manual backups |
+| Monitoring | System resource metrics |
+| File Manager | File browsing and editing |
+| Terminal | Web-based PTY terminal |
+| AI | AI assistant integration |
+| App Store | One-click Docker app catalog |
+| MCP Server | Model Context Protocol endpoints |
+| Firewall | Firewall rule management |
+| PHP | PHP version and site management |
+| Deploy | Git-based deployment pipelines |
+
+## Service Management
+
+- Runs as a **systemd** service in production
+- Configuration via environment variables in **`/etc/webcasa/webcasa.env`**
+- Caddy binary managed as a child process with lifecycle control (start, stop, reload)

@@ -1,0 +1,52 @@
+---
+title: File Manager
+description: Browse, upload, download, edit, and manage files on your server through the web interface
+---
+
+The File Manager provides a **web-based file browser** for managing server files directly from your browser -- no SSH or FTP required.
+
+## File Browsing
+
+Navigate your server's file system with an explorer-style interface:
+
+- **Directory tree** -- click folders to navigate, use the breadcrumb bar to jump to parent directories, or type a path directly
+- **File details** -- each entry shows name, size, permissions, owner, and last modified date
+- **Batch selection** -- select multiple files and folders for bulk operations
+
+## File Operations
+
+| Operation | Description |
+|-----------|-------------|
+| **Create folder** | Create new directories at any path |
+| **Rename** | Rename files and folders inline |
+| **Upload** | Drag-and-drop or file picker, supports multiple files with per-file progress |
+| **Download** | Single-click download for individual files |
+| **Delete** | Remove files and directories (with confirmation) |
+| **Set permissions** | Change file permissions using chmod (e.g., `755`, `644`) |
+
+## Built-in Editor
+
+Edit files directly in the browser with **syntax highlighting** for common formats:
+
+- Configuration files (`.conf`, `.ini`, `.env`, `.toml`, `.yaml`)
+- Web files (HTML, CSS, JavaScript)
+- Shell scripts, Go, Python, PHP
+- JSON, XML
+
+> **Tip:** The built-in editor is ideal for quick config edits. For larger editing tasks, use the Web Terminal with your preferred editor (`vim`, `nano`).
+
+## Compress and Extract
+
+The File Manager supports creating and extracting archives:
+
+### Creating Archives
+1. Select one or more files or directories
+2. Choose **Compress**
+3. The selected items are packaged into an archive
+
+### Extracting Archives
+1. Select a compressed file
+2. Choose **Extract**
+3. Contents are extracted to the target directory
+
+> **Note:** The File Manager respects Linux file permissions. Operations that the Web.Casa process user cannot perform will return an appropriate error message. Verify the process user has the necessary read/write access to the target paths.

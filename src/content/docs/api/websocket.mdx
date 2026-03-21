@@ -1,0 +1,100 @@
+---
+title: WebSocket API
+description: Real-time terminal sessions, monitoring streams, deploy logs, and container log streaming over WebSocket
+---
+
+Web.Casa uses **WebSocket** for features requiring real-time, bidirectional communication. All WebSocket connections authenticate with the same JWT token used for the REST API.
+
+## Authentication
+
+Pass the JWT token as a **query parameter** when opening a WebSocket connection:
+
+```
+ws://your-server:39921/ws/terminal?token=<jwt-token>
+```
+
+> **Important:** WebSocket connections are subject to the same [RBAC](/security/rbac/) permissions as REST API endpoints. Viewer-role tokens cannot access admin-only WebSocket endpoints like the terminal.
+
+## Endpoints
+
+### Terminal (PTY)
+
+**`/ws/terminal`**
+
+Provides full **PTY access** for web-based terminal sessions, powered by [xterm.js](https://xtermjs.org/) on the frontend.
+
+| Feature | Detail |
+|---------|--------|
+| **Protocol** | Binary frames for input/output |
+| **Resize** | Supports dynamic window resize events for PTY adjustment |
+| **Sessions** | Multiple simultaneous terminal sessions on separate connections |
+| **Access** | **Admin only** |
+
+**Flow:**
+
+1. Client opens WebSocket connection with JWT token
+2. Server spawns a PTY process
+3. Client sends keyboard input as binary frames
+4. Server streams terminal output as binary frames
+5. Client sends resize events when the terminal window dimensions change
+
+### Monitoring (Real-Time Metrics)
+
+**`/ws/monitor`**
+
+Streams system metrics to connected clients in real time.
+
+| Metric | Description |
+|--------|-------------|
+| **CPU** | Usage percentage per core and total |
+| **Memory** | Used, available, total, and swap |
+| **Disk** | Usage, I/O rates, and mount points |
+| **Network** | Inbound/outbound traffic rates per interface |
+
+- Server pushes JSON messages at a regular interval
+- Significantly lower overhead than REST polling
+
+### Deploy (Build Log Streaming)
+
+**`/ws/deploy`**
+
+Streams build and deployment logs in real time during Git-based deployments.
+
+- Client receives log lines as they are produced by the build process
+- Provides live feedback during `git pull`, dependency installation, and build steps
+- Connection closes when the deployment completes or fails
+
+### Docker (Container Log Streaming)
+
+**`/ws/docker/logs/:id`**
+
+Streams container stdout/stderr in real time, equivalent to `docker logs -f`.
+
+| Parameter | Description |
+|-----------|-------------|
+| **`:id`** | Container ID or name |
+
+- Streams both stdout and stderr
+- Supports timestamp display
+- Connection remains open for continuous log tailing
+
+## Message Format
+
+All WebSocket messages use one of two formats:
+
+- **Binary frames** -- used for terminal I/O (raw PTY data)
+- **JSON text frames** -- used for monitoring metrics, deploy logs, and container logs
+
+Example monitoring message:
+
+```json
+{
+  "type": "metrics",
+  "data": {
+    "cpu": 12.5,
+    "memory": { "used": 2147483648, "total": 8589934592 },
+    "disk": { "used": 42949672960, "total": 107374182400 },
+    "network": { "rx_rate": 1048576, "tx_rate": 524288 }
+  }
+}
+```

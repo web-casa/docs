@@ -1,0 +1,191 @@
+---
+title: Build & Deploy
+description: Build pipelines, environment variables, and deployment flow
+---
+
+This page covers the complete build and deployment lifecycle -- from build modes and environment variables to health checks, cron jobs, and AI-powered diagnostics.
+
+---
+
+## Build Modes
+
+Web.Casa supports two build modes for deploying applications:
+
+### Bare Metal (systemd)
+
+The application is built and run directly on the host, managed as a **systemd service**.
+
+- Dependencies are installed on the host
+- The application process is managed by systemd with automatic restart
+- Best for **Node.js apps**, **Go binaries**, **Python apps**, and other server-side applications
+
+### Docker (Dockerfile)
+
+The application is containerized using a **Dockerfile** in the repository.
+
+- Web.Casa builds a Docker image from the Dockerfile
+- A container is created and started from the built image
+- Best for applications with **complex dependencies** or when you need **environment isolation**
+
+| Mode | Managed By | Isolation | Best For |
+|------|-----------|-----------|----------|
+| **Bare Metal** | systemd | Process-level | Simple apps, low overhead |
+| **Docker** | Docker daemon | Container-level | Complex deps, reproducibility |
+
+> Choose **Bare Metal** for simplicity and lower resource overhead. Choose **Docker** when you need full environment isolation or when your app has a Dockerfile already.
+
+---
+
+## Build Configuration
+
+Customize the build pipeline for each project:
+
+| Setting | Description | Example |
+|---------|-------------|---------|
+| **Install command** | Dependency installation | `npm install`, `pip install -r requirements.txt` |
+| **Build command** | Compile or bundle the app | `npm run build`, `go build -o app` |
+| **Start command** | Launch the application | `npm start`, `./app`, `python manage.py runserver` |
+| **Build timeout** | Max build duration (minutes) | `10` |
+
+### Resource Limits
+
+Prevent builds from consuming excessive server resources:
+
+| Limit | Description |
+|-------|-------------|
+| **Memory (MB)** | Maximum memory the build process can use |
+| **CPU (%)** | Maximum CPU percentage allocated to the build |
+| **Build timeout (min)** | Automatically cancel builds that exceed this duration |
+
+### Build Cache
+
+Web.Casa caches dependencies between builds to speed up subsequent deployments. If a build behaves unexpectedly:
+
+1. Open your project settings.
+2. Click **Clear Build Cache**.
+3. Trigger a new deployment.
+
+---
+
+## Environment Variables
+
+Each project has its own set of environment variables, available during both build and runtime.
+
+### Managing Variables
+
+- **Add individually** -- enter key-value pairs one at a time
+- **Import from another project** -- copy environment variables from an existing project
+- **Bulk import** -- paste `.env` format content
+
+### Security
+
+- Sensitive values are **masked** in the UI and build logs
+- Variables are stored **encrypted** on the server
+- Only users with project access can view or edit variables
+
+> Use environment variables for database URLs, API keys, secrets, and any configuration that should not be hardcoded in your repository.
+
+---
+
+## Domain Configuration
+
+Optionally assign a domain to your deployed project:
+
+1. Enter a **domain name** in the project settings.
+2. Web.Casa automatically creates a **reverse proxy** configuration.
+3. Point your domain's DNS to the server IP.
+
+The reverse proxy routes incoming traffic to your application's port, handling TLS termination if configured.
+
+---
+
+## Health Checks
+
+Configure health checks to monitor your application after deployment:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Path** | HTTP endpoint to check (e.g., `/health`, `/`) | `/` |
+| **Timeout** | Seconds to wait for a response | `5` |
+| **Retries** | Number of failed checks before marking unhealthy | `3` |
+
+Web.Casa periodically sends HTTP requests to the health check path. If the application fails to respond within the configured timeout after the specified number of retries, it is marked as **unhealthy**.
+
+---
+
+## Processes
+
+Web.Casa supports **multiple processes per project**. This is useful for applications that need:
+
+- A **web server** process
+- A **background worker** process
+- A **scheduler** process
+
+Each process can have its own start command and is managed independently.
+
+---
+
+## Cron Jobs
+
+Schedule recurring tasks for each project:
+
+1. Navigate to the **Cron** tab in your project.
+2. Click **Add Cron Job**.
+3. Configure:
+   - **Schedule** -- standard cron expression (e.g., `0 */6 * * *` for every 6 hours)
+   - **Command** -- the command to execute
+
+Cron jobs run in the context of your project with access to its environment variables.
+
+---
+
+## Build Logs & Runtime Logs
+
+### Build Logs
+
+Every deployment generates a complete build log showing:
+
+- Dependency installation output
+- Build command output
+- Deployment steps
+- Any errors or warnings
+
+### Runtime Logs
+
+View your application's runtime output:
+
+- **stdout and stderr** streams
+- **Real-time streaming** with auto-scroll
+- Useful for debugging runtime issues
+
+---
+
+## AI-Powered Features
+
+Web.Casa integrates AI capabilities to assist with deployment tasks:
+
+### AI Build Diagnosis
+
+When a build fails, AI analyzes the build logs and provides:
+
+- **Root cause identification** -- pinpoints the likely cause of failure
+- **Fix suggestions** -- actionable steps to resolve the issue
+- **Common patterns** -- recognizes frequent errors like missing dependencies, version mismatches, or configuration issues
+
+### AI Code Review
+
+Get AI-powered feedback on your code changes before or after deployment.
+
+### Smart Environment Variable Suggestions
+
+AI analyzes your project structure and suggests environment variables that may be needed, based on:
+
+- Framework requirements
+- Database connections detected in code
+- Third-party service integrations
+
+### Rollback Advice
+
+When issues arise after deployment, AI reviews the changes and provides recommendations on whether to rollback and which deployment to target.
+
+> AI features are designed to assist, not replace, your judgment. Always review AI suggestions before applying them.

@@ -1,0 +1,103 @@
+---
+title: REST API
+description: Complete reference for the Web.Casa REST API including authentication, endpoint groups, plugin APIs, and examples
+---
+
+Web.Casa exposes a **RESTful API** that powers the frontend and is available for external integrations. All endpoints are under the `/api/` base path.
+
+**Base URL:** `http://your-server:39921/api/`
+
+## Authentication
+
+All endpoints except the login endpoint require a **JWT Bearer token**.
+
+1. Send a `POST` to `/api/auth/login` with credentials
+2. Complete the **ALTCHA Proof-of-Work challenge** (handled automatically by the client)
+3. If **TOTP 2FA** is enabled, provide the six-digit code
+4. Receive a JWT token in the response
+5. Include the token in all subsequent requests:
+
+```
+Authorization: Bearer <token>
+```
+
+> **Tip:** All API endpoints are subject to [RBAC](/security/rbac/) enforcement. Viewer-role tokens can only access read-only endpoints.
+
+## Core Endpoint Groups
+
+| Group | Endpoints | Description |
+|-------|-----------|-------------|
+| **Auth** | `/api/auth/*` | Login, logout, token management |
+| **Hosts** | `/api/hosts/*` | Reverse proxy host CRUD |
+| **DNS Providers** | `/api/dns-providers/*` | DNS provider CRUD for certificate challenges |
+| **Certificates** | `/api/certificates/*` | SSL/TLS certificate management |
+| **Users** | `/api/users/*` | User account management |
+| **Audit Logs** | `/api/audit/*` | Query audit log entries |
+| **Settings** | `/api/settings/*` | Panel settings, server IP, auto-reload configuration |
+| **Caddy** | `/api/caddy/*` | Caddy process control (start, stop, reload) |
+| **Import/Export** | `/api/import-export/*` | Panel configuration backup and restore |
+
+Each group follows standard REST conventions:
+
+- `GET` -- list or read resources
+- `POST` -- create resources
+- `PUT` -- update resources
+- `DELETE` -- remove resources
+
+## Plugin APIs
+
+Plugins extend the REST API with their own endpoint groups:
+
+| Plugin | Base Path | Key Operations |
+|--------|-----------|----------------|
+| **Docker** | `/api/docker/*` | Container & Compose stack management |
+| **Deploy** | `/api/deploy/*` | Git-based deployment, build triggers |
+| **AI** | `/api/ai/*` | AI assistant interactions |
+| **Database** | `/api/database/*` | MySQL/PostgreSQL database & user management |
+| **Monitoring** | `/api/monitoring/*` | System metrics and resource usage |
+| **Backup** | `/api/backup/*` | Scheduled and manual backup operations |
+| **App Store** | `/api/appstore/*` | One-click app catalog and installation |
+| **File Manager** | `/api/files/*` | File browsing, upload, download, editing |
+| **Firewall** | `/api/firewall/*` | Firewall rule management |
+| **MCP** | `/api/mcp/*` | Model Context Protocol server endpoints |
+
+## Example Requests
+
+```bash
+# Login
+curl -X POST http://your-server:39921/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"your-password"}'
+
+# List all reverse proxy hosts
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  http://your-server:39921/api/hosts
+
+# Create a new host
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"domain":"app.example.com","upstream":"127.0.0.1:3000","ssl":true}' \
+  http://your-server:39921/api/hosts
+
+# Get audit logs filtered by action
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "http://your-server:39921/api/audit?action=delete"
+```
+
+## Response Format
+
+All responses use a consistent JSON envelope:
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": { }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| **`code`** | `0` for success, non-zero for errors |
+| **`message`** | Human-readable status or error description |
+| **`data`** | Response payload (object, array, or null) |

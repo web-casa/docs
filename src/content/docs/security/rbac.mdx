@@ -1,0 +1,60 @@
+---
+title: RBAC
+description: Role-based access control with Admin and Viewer roles, permission enforcement, and user management rules
+---
+
+Web.Casa implements **role-based access control (RBAC)** with two predefined roles. Permissions are enforced at the **API level** -- the backend rejects unauthorized requests regardless of what the frontend displays.
+
+## Roles
+
+| Role | Access Level | Description |
+|------|-------------|-------------|
+| **Admin** | Full control | Create, modify, and delete all resources; manage users and settings |
+| **Viewer** | Read-only | View dashboards, configurations, metrics, and logs |
+
+### Admin Capabilities
+
+Administrators have unrestricted access to all features:
+
+- **Host management** -- create, edit, delete reverse proxy hosts and DNS providers
+- **Certificate management** -- issue, renew, and manage SSL/TLS certificates
+- **User management** -- create, edit, and delete user accounts
+- **System settings** -- configure panel settings, Caddy, and environment
+- **All plugins** -- Docker, database, backup, monitoring, file manager, terminal, firewall, deploy, AI, app store, MCP
+- **Audit logs** -- view complete operation history
+
+### Viewer Capabilities
+
+Viewers have **read-only** access:
+
+- View host configurations and status
+- View system monitoring metrics
+- Browse container and database status
+- Read audit logs
+
+Viewers **cannot**:
+
+- Create, modify, or delete any resource
+- Manage user accounts
+- Access the web terminal or firewall
+- Change system settings
+
+## Permission Enforcement
+
+Permissions are checked on every API request through a two-layer mechanism:
+
+1. **Backend enforcement** -- The authentication middleware extracts the user's role from their JWT token. Each API route specifies a **minimum required role**. Requests that do not meet the requirement receive a **403 Forbidden** response.
+2. **Frontend enforcement** -- The UI dynamically hides or disables buttons, forms, and menu items based on the current user's role. This is a convenience layer only; the backend is the authoritative enforcer.
+
+## User Management Rules
+
+- The **first user** created during initial setup is always an **Admin**
+- Administrators can create new users and assign either role
+- Administrators can edit or delete other users
+- **You cannot delete your own account** -- this prevents accidental lockout
+- Password minimum is **6 characters**
+- All user management actions are recorded in the [audit log](/security/audit-logging/)
+
+## Plugin Permissions
+
+Plugins integrate with the RBAC system. Admin-only plugins (terminal, firewall, file manager) automatically enforce the Admin role requirement. Role assignments and permission changes are recorded in the audit log.

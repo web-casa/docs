@@ -1,0 +1,101 @@
+---
+title: Development Setup
+description: Set up your local development environment for contributing to Web.Casa
+---
+
+This guide walks you through setting up a local development environment for Web.Casa.
+
+## Prerequisites
+
+| Requirement | Version | Notes |
+|-------------|---------|-------|
+| **Go** | 1.26+ | Backend compiler |
+| **Node.js** | 24+ | Frontend build toolchain |
+| **npm** | Bundled with Node.js | Package manager |
+| **GCC** | Any recent version | Required for CGo (SQLite) |
+| **Git** | Any recent version | Version control |
+
+> **Optional:** Install **Docker** if you want to test container management features. It is not required for core development.
+
+Development has been tested on **Linux** and **macOS**.
+
+## Clone the Repository
+
+1. Fork the Web.Casa repository on GitHub
+2. Clone your fork:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/webcasa.git
+cd webcasa
+```
+
+## Install Dependencies
+
+```bash
+# Go backend dependencies
+go mod download
+
+# Frontend dependencies
+cd web && npm install
+```
+
+## Start Development Servers
+
+You need **two terminals** -- one for the backend, one for the frontend.
+
+**Terminal 1 -- Backend:**
+
+```bash
+go run .
+```
+
+The API server starts at **http://localhost:39921**.
+
+**Terminal 2 -- Frontend:**
+
+```bash
+cd web && npm install && npm run dev
+```
+
+The frontend dev server starts at **http://localhost:5173** with hot module replacement (HMR). API requests are **automatically proxied** to the Go backend -- no CORS configuration needed.
+
+> **Tip:** Open **http://localhost:5173** in your browser for development. The frontend dev server provides instant HMR updates. The backend at port 39921 serves the compiled production frontend and is used for API proxying.
+
+## Database
+
+Web.Casa uses **SQLite** -- no external database setup is required. A development database file is created automatically in the `data/` directory on first run.
+
+## Hot Reload Behavior
+
+- **Frontend** -- Vite HMR applies changes instantly without page refresh
+- **Backend** -- you must restart `go run .` after Go code changes
+
+## Build for Production
+
+```bash
+make build
+```
+
+This compiles the Go backend (with the frontend embedded as static assets) into a single binary.
+
+## Project Structure
+
+```
+webcasa/
+├── main.go                  # Entry point
+├── VERSION                  # Version number (single source of truth)
+├── Makefile                 # Build tasks
+├── internal/
+│   ├── config/              # Environment config loading
+│   ├── model/               # Data models (GORM structs)
+│   ├── database/            # SQLite initialization
+│   ├── auth/                # JWT authentication
+│   ├── caddy/               # Caddy process management + Caddyfile rendering
+│   ├── service/             # Business logic
+│   └── handler/             # HTTP route handlers
+├── web/                     # React 19 frontend
+│   └── src/pages/           # Page components
+├── install.sh               # One-click install script
+├── Dockerfile
+└── docker-compose.yml
+```

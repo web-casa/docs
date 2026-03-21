@@ -1,0 +1,114 @@
+---
+title: DNS 验证与通配符
+description: 通过 DNS 验证方式签发通配符证书，支持 Cloudflare、阿里云、腾讯云、Route53 等提供商
+---
+
+DNS 验证通过创建 **DNS TXT 记录**来证明域名所有权，而不是响应 HTTP 请求。这是签发通配符证书的**必要条件**，也适用于服务器无法从互联网直接访问的场景。
+
+## 何时使用 DNS 验证
+
+- **通配符证书** -- `*.example.com` 必须使用 DNS 验证，HTTP 验证不支持
+- **NAT 后的服务器** -- 80/443 端口无法从外部访问
+- **CDN 后的服务器** -- Cloudflare、AWS CloudFront 等 CDN 代理会拦截 HTTP 验证
+- **防火墙限制** -- 企业或运营商防火墙阻止验证流量
+- **内网服务器使用公网域名** -- 私有 IP 但域名公开可解析
+
+## 支持的 DNS 提供商
+
+| 提供商 | 所需凭据 | 说明 |
+|-------|---------|------|
+| **Cloudflare** | 具有 `Zone:DNS:Edit` 权限的 API Token | 最常用，传播速度快 |
+| **阿里云 DNS** | AccessKey ID + AccessKey Secret | 中国大陆 DNS |
+| **腾讯云 DNS**（DNSPod） | SecretId + SecretKey | 中国大陆 DNS |
+| **AWS Route 53** | Access Key + Secret Key + Region | 需要托管区域的 IAM 权限 |
+
+## 添加 DNS 提供商
+
+1. 进入**设置 > DNS 提供商**。
+2. 点击**添加提供商**。
+3. 从下拉菜单中选择 DNS 服务。
+4. 输入所需的 API 凭据：
+
+**Cloudflare：**
+- **API Token** -- 在 [Cloudflare 控制台](https://dash.cloudflare.com/profile/api-tokens) 创建，需要 **Zone > DNS > Edit** 权限
+
+**阿里云 DNS：**
+- **Access Key ID** -- 从阿里云 AccessKey 管理控制台获取
+- **Access Key Secret** -- 对应的密钥
+
+**腾讯云 DNS：**
+- **Secret ID** -- 从腾讯云 API 密钥管理控制台获取
+- **Secret Key** -- 对应的密钥
+
+**AWS Route 53：**
+- **Access Key** -- 具有 Route 53 权限的 IAM 用户访问密钥
+- **Secret Key** -- 对应的密钥
+- **Region** -- AWS 区域（如 `us-east-1`）
+
+5. 点击**保存**。
+
+> 每个提供商可设为**默认** DNS 提供商。使用 DNS 验证的新站点将自动使用默认提供商，除非手动指定其他提供商。
+
+## 为站点启用 DNS 验证
+
+1. 在**反向代理**模块中创建或编辑站点。
+2. 在 TLS 模式中选择 **DNS 验证**（通配符域名选择**通配符（DNS）**）。
+3. 从下拉菜单中选择已配置的 DNS 提供商。
+4. 如果是通配符证书，域名填写 `*.example.com`。
+5. 点击**保存**。
+
+Caddy 随后自动执行：
+
+1. 通过提供商 API 创建所需的 `_acme-challenge` TXT 记录
+2. 等待 DNS 传播
+3. 向 Let's Encrypt / ZeroSSL 完成 ACME DNS-01 验证
+4. 验证完成后清理 TXT 记录
+5. 在到期前自动续期证书
+
+## 通配符证书
+
+`*.example.com` 的通配符证书覆盖所有单级子域名：
+
+- `app.example.com`
+- `api.example.com`
+- `blog.example.com`
+
+**不覆盖：**
+
+- 裸域名 `example.com`（需另外创建站点）
+- 嵌套子域名如 `sub.app.example.com`（需要单独的证书或独立的通配符）
+
+设置通配符证书：
+
+1. 添加 DNS 提供商（见上文）。
+2. 创建新站点，域名填写 `*.example.com`。
+3. TLS 模式选择**通配符（DNS）**。
+4. 选择 DNS 提供商。
+5. 保存站点。
+
+## 多提供商
+
+可以同时配置**多个 DNS 提供商**。每个站点可使用不同的提供商，适用于：
+
+- 跨不同注册商管理域名
+- 不同团队使用不同的 DNS 服务
+- 从一个 DNS 提供商迁移到另一个
+
+## 故障排查
+
+**证书签发失败：**
+
+- 检查 API 凭据是否正确且具有所需权限
+- 确认域名由所选 DNS 提供商管理
+- 检查服务器能否访问 DNS 提供商的 API
+
+**DNS 传播超时：**
+
+- 部分提供商的 TXT 记录传播较慢
+- Caddy 会自动重试，但传播时间过长（>2 分钟）可能导致超时
+- 使用 `dig _acme-challenge.example.com TXT` 验证 TXT 记录是否已生效
+
+**通配符未覆盖预期子域名：**
+
+- 确认站点域名填写的是 `*.example.com`（不是 `example.com`）
+- 确认 TLS 模式设置为**通配符（DNS）**，而非仅**DNS 验证**

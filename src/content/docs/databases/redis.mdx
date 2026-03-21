@@ -1,0 +1,85 @@
+---
+title: Redis
+description: Manage Redis instances, execute commands, and configure persistence and eviction policies
+---
+
+Web.Casa provides full lifecycle management for **Redis** through Docker-based instances. Create, configure, and administer Redis instances entirely from the web panel.
+
+## Instance Management
+
+Each Redis instance runs as an **isolated Docker container**.
+
+### Creating an Instance
+
+1. Navigate to **Databases** and click **Create Instance**.
+2. Select **Redis** as the engine.
+3. Configure the instance name and optional authentication password.
+4. Optionally select a **preset** (Development or Production).
+5. Click **Create** to spin up the container.
+
+### Instance Operations
+
+| Action | Description |
+|--------|-------------|
+| **Start** | Boot the container and accept connections |
+| **Stop** | Gracefully shut down the instance |
+| **Delete** | Remove the container and all associated data |
+
+> Deleting an instance is **irreversible**. Ensure you have backups if persistence data matters.
+
+## Connection Info
+
+Each instance provides ready-to-use connection details in multiple formats:
+
+- **CLI command** -- `redis-cli` command ready to paste into a terminal
+- **Connection URI** -- `redis://:password@host:port` for application configs
+- **Environment variable** -- `REDIS_URL=...` for `.env` files
+- **Docker internal address** -- for services running in the same Docker network
+
+## Command Console
+
+The built-in **command console** lets you execute Redis commands against any instance directly from the browser:
+
+- Run any Redis command (`GET`, `SET`, `HGETALL`, `KEYS`, etc.)
+- View formatted responses for all data types
+- Switch between instances from a dropdown
+
+> The command console works across all Redis instances managed by Web.Casa.
+
+## Logs
+
+View real-time **instance logs** from the container output. Useful for debugging connection issues, monitoring slow operations, and verifying configuration changes.
+
+## Advanced Configuration
+
+Fine-tune instance behavior through the **Settings** tab. You can also apply a **Development** or **Production** preset as a starting point.
+
+### Memory and Eviction
+
+| Parameter | Description |
+|-----------|-------------|
+| **Max Memory** | Upper memory limit for the instance |
+| **Eviction Policy** | Behavior when max memory is reached (see table below) |
+
+**Available eviction policies:**
+
+| Policy | Behavior |
+|--------|----------|
+| `noeviction` | Return errors when memory limit is reached (no keys removed) |
+| `allkeys-lru` | Remove least recently used keys from **all** keys |
+| `volatile-lru` | Remove least recently used keys from keys **with an expiry set** |
+| `allkeys-random` | Remove random keys from **all** keys |
+| `volatile-ttl` | Remove keys with the **shortest TTL** first |
+
+### Persistence
+
+| Parameter | Description |
+|-----------|-------------|
+| **AOF Persistence** | Append-Only File -- logs every write operation for durability |
+| **RDB Snapshots** | Point-in-time snapshots at configured intervals |
+
+- **AOF** provides stronger durability guarantees (at most one second of data loss)
+- **RDB** provides compact snapshots and faster restarts
+- Both can be enabled simultaneously for maximum safety
+
+> **Production preset** enables AOF persistence and sets a higher max memory limit. **Development preset** uses minimal resources with persistence disabled.

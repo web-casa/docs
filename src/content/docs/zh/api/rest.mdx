@@ -1,0 +1,103 @@
+---
+title: REST API
+description: Web.Casa REST API 完整参考，包括认证、端点分组、插件 API 和请求示例
+---
+
+Web.Casa 提供完整的 **RESTful API**，驱动前端界面并支持外部集成。所有端点位于 `/api/` 基础路径下。
+
+**基础 URL：** `http://your-server:39921/api/`
+
+## 认证
+
+除登录端点外，所有端点均需要 **JWT Bearer 令牌**。
+
+1. 向 `/api/auth/login` 发送 `POST` 请求并提供凭据
+2. 完成 **ALTCHA 工作量证明挑战**（由客户端自动处理）
+3. 若启用了 **TOTP 双因素认证**，需提供六位验证码
+4. 响应中获取 JWT 令牌
+5. 在后续所有请求中携带令牌：
+
+```
+Authorization: Bearer <token>
+```
+
+> **提示：** 所有 API 端点受 [RBAC](/zh/security/rbac/) 权限控制。查看者角色的令牌只能访问只读端点。
+
+## 核心端点分组
+
+| 分组 | 端点 | 说明 |
+|------|------|------|
+| **认证** | `/api/auth/*` | 登录、登出、令牌管理 |
+| **主机** | `/api/hosts/*` | 反向代理主机 CRUD |
+| **DNS 提供商** | `/api/dns-providers/*` | 证书验证用 DNS 提供商 CRUD |
+| **证书** | `/api/certificates/*` | SSL/TLS 证书管理 |
+| **用户** | `/api/users/*` | 用户账户管理 |
+| **审计日志** | `/api/audit/*` | 查询审计日志条目 |
+| **设置** | `/api/settings/*` | 面板设置、服务器 IP、自动重载配置 |
+| **Caddy** | `/api/caddy/*` | Caddy 进程控制（启动、停止、重载） |
+| **导入/导出** | `/api/import-export/*` | 面板配置备份与恢复 |
+
+每个分组遵循标准 REST 规范：
+
+- `GET` -- 列出或读取资源
+- `POST` -- 创建资源
+- `PUT` -- 更新资源
+- `DELETE` -- 删除资源
+
+## 插件 API
+
+插件通过各自的端点分组扩展 REST API：
+
+| 插件 | 基础路径 | 主要操作 |
+|------|---------|---------|
+| **Docker** | `/api/docker/*` | 容器和 Compose 栈管理 |
+| **部署** | `/api/deploy/*` | 基于 Git 的部署和构建触发 |
+| **AI** | `/api/ai/*` | AI 助手交互 |
+| **数据库** | `/api/database/*` | MySQL/PostgreSQL 数据库和用户管理 |
+| **监控** | `/api/monitoring/*` | 系统指标和资源使用情况 |
+| **备份** | `/api/backup/*` | 定时和手动备份操作 |
+| **应用商店** | `/api/appstore/*` | 一键应用目录和安装 |
+| **文件管理** | `/api/files/*` | 文件浏览、上传、下载、编辑 |
+| **防火墙** | `/api/firewall/*` | 防火墙规则管理 |
+| **MCP** | `/api/mcp/*` | Model Context Protocol 服务端点 |
+
+## 请求示例
+
+```bash
+# 登录
+curl -X POST http://your-server:39921/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"your-password"}'
+
+# 获取所有反向代理主机
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  http://your-server:39921/api/hosts
+
+# 创建新主机
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"domain":"app.example.com","upstream":"127.0.0.1:3000","ssl":true}' \
+  http://your-server:39921/api/hosts
+
+# 按动作类型筛选审计日志
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "http://your-server:39921/api/audit?action=delete"
+```
+
+## 响应格式
+
+所有响应使用统一的 JSON 封装格式：
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": { }
+}
+```
+
+| 字段 | 说明 |
+|------|------|
+| **`code`** | `0` 表示成功，非零表示错误 |
+| **`message`** | 可读的状态或错误描述 |
+| **`data`** | 响应载荷（对象、数组或 null） |

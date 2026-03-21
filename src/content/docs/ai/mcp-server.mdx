@@ -1,0 +1,177 @@
+---
+title: MCP Server
+description: Model Context Protocol server with 44 tools, API token management, and IDE configuration
+---
+
+Web.Casa implements a **Model Context Protocol (MCP)** server as a dedicated plugin, exposing **44 tools** that let external AI tools and IDEs interact with your server through a standardized interface.
+
+## What Is MCP
+
+**MCP (Model Context Protocol)** is a standard that exposes server management capabilities as structured tools that AI models can call. By connecting an MCP-compatible client to Web.Casa's MCP server, your AI assistant gains the ability to manage hosts, containers, files, databases, and more — all through natural language.
+
+## API Token Management
+
+Access to the MCP server is authenticated via **API tokens** with scope-based permissions.
+
+### Creating a Token
+
+1. Navigate to **Settings > MCP Server**
+2. Click **Create Token**
+3. Choose an expiry option:
+
+| Expiry | Use Case |
+|--------|----------|
+| **30 days** | Short-term testing or temporary access |
+| **90 days** | Regular development workflows |
+| **180 days** | Long-running integrations |
+| **365 days** | Annual renewal cycle |
+| **No expiry** | Persistent integrations (use with caution) |
+
+4. Copy the full token immediately — it is only shown once
+
+### Token Security
+
+- Tokens are prefixed with `wc_` for easy identification
+- Stored as **SHA-256 hashes** — the raw token is shown only once at creation
+- Each token tracks **creation date**, **expiry**, and **last used** timestamp
+- **Permission scopes** use `category:action` format (e.g., `hosts:write`, `deploy:read`)
+- Wildcard `*:*` grants full access
+- Tokens can be **revoked immediately** from the settings UI
+
+> **Tip:** Rotate tokens periodically. If a token may have been compromised, revoke it immediately and create a new one.
+
+## MCP Endpoint
+
+```
+https://your-server.com/api/mcp
+```
+
+## IDE Configuration
+
+### Cursor
+
+```json
+{
+  "mcpServers": {
+    "webcasa": {
+      "url": "https://your-server.com/api/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN"
+      }
+    }
+  }
+}
+```
+
+### Windsurf
+
+```json
+{
+  "mcpServers": {
+    "webcasa": {
+      "url": "https://your-server.com/api/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN"
+      }
+    }
+  }
+}
+```
+
+### Claude Code
+
+```json
+{
+  "mcpServers": {
+    "webcasa": {
+      "url": "https://your-server.com/api/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN"
+      }
+    }
+  }
+}
+```
+
+> **Tip:** The configuration snippets on the MCP Server settings page are pre-filled with your actual server URL. Copy them directly and only replace the token value.
+
+## Available Tools (44 Total)
+
+### Host Management
+- `list_hosts` — list all reverse proxy hosts
+- `create_host` — create a new host with domain, upstream, and TLS settings
+- `update_host` — update upstream, TLS mode, WebSocket, compression, or enabled state
+- `delete_host` — remove a host by ID
+- `toggle_host` — enable or disable a host
+
+### Project Deployment
+- `list_projects` — list all deployment projects
+- `get_project` — get project details
+- `deploy_project` — create a project from Git and trigger the first build
+- `build_project` — trigger a new build for an existing project
+- `get_build_logs` — get build logs for a project
+- `auto_deploy` — one-command: Git URL → project → build → reverse proxy with HTTPS
+
+### Docker
+- `docker_ps` — list all containers with status, ports, and resource usage
+- `docker_logs` — get container logs
+- `docker_run` — run a new container with image, ports, volumes, and env vars
+- `list_stacks` — list Docker Compose stacks
+- `create_stack` — create a Compose stack from YAML
+- `control_stack` — up, down, or restart a Compose stack
+- `get_stack_logs` — get stack logs
+
+### Database
+- `list_db_instances` — list all managed database instances
+- `create_db_instance` — create a new database instance
+- `execute_query` — execute a read-only SQL query
+
+### System & Files
+- `get_system_metrics` — CPU, memory, disk usage, load average
+- `get_system_info` — hostname, OS, kernel, uptime, CPU cores, architecture
+- `run_command` — execute a shell command with timeout
+- `read_file` — read file contents
+- `list_directory` — list files and directories
+- `write_file` — write content to a file
+- `delete_file` — delete a file
+
+### AI-Powered
+- `generate_compose` — generate Docker Compose YAML from natural language
+- `diagnose_error` — analyze error logs with AI for root causes and fixes
+
+### Monitoring & Alerts
+- `list_alert_rules` — list all alert rules
+- `create_alert_rule` — create a monitoring alert rule
+- `get_alert_history` — get recent alerts
+
+### Firewall
+- `firewall_status` — get firewall status and active zones
+- `manage_firewall_rule` — add or remove port or service rules
+
+### Notifications
+- `list_notify_channels` — list configured notification channels
+
+### Backup
+- `trigger_backup` — trigger an immediate system backup
+
+### System Inspection
+- `run_inspection` — run a health inspection with AI-powered analysis
+
+### App Store
+- Search, install, and list installed applications
+
+### Cron Jobs
+- `list_cron_jobs` — list all scheduled jobs (optional tag filter)
+- `get_cron_job_logs` — get execution logs
+- `create_cron_job` — create a scheduled job
+- `update_cron_job` — update job settings
+- `delete_cron_job` — delete a job
+- `trigger_cron_job` — manually trigger a job
+
+## Security Considerations
+
+- Always use **HTTPS** for the MCP endpoint to protect tokens in transit
+- Create separate tokens for different clients or team members
+- Use **scoped permissions** — grant only the categories each client needs
+- Monitor the **last used** timestamp to detect unused or potentially compromised tokens
+- Revoke tokens when they are no longer needed

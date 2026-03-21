@@ -1,0 +1,162 @@
+---
+title: 开发插件
+description: 创建自定义 Web.Casa 插件的完整指南，包括 Plugin 接口和事件总线
+---
+
+你可以通过开发自定义插件来扩展 Web.Casa。插件是一个实现 **Plugin 接口**的 Go 包，编译到 Web.Casa 二进制文件中。
+
+## 前提条件
+
+- **Go**（版本需与 Web.Casa 的 go.mod 一致）
+- 熟悉 **Gin** Web 框架（用于路由）
+- **React**（用于前端组件）
+- 了解[插件系统](/zh/plugins/plugin-system/)架构
+
+## 项目结构
+
+在 `internal/plugins/` 下创建以插件名命名的目录：
+
+```
+internal/plugins/myplugin/
+  myplugin.go       # 插件结构体和生命周期方法
+  handler.go        # HTTP 处理器
+  service.go        # 业务逻辑
+  model.go          # 数据库模型
+```
+
+## 实现 Plugin 接口
+
+插件结构体必须实现以下生命周期方法：
+
+```go
+type MyPlugin struct {
+    core *core.API
+    db   *gorm.DB
+}
+
+func (p *MyPlugin) Info() core.PluginInfo {
+    return core.PluginInfo{
+        Name:         "myplugin",
+        Version:      "1.0.0",
+        Description:  "我的自定义插件",
+        Dependencies: []string{"docker"}, // 可选
+    }
+}
+
+func (p *MyPlugin) Init(api *core.API) error {
+    p.core = api
+    p.db = api.GetDB()
+    // 自动迁移数据库表
+    // 注册事件订阅
+    return nil
+}
+
+func (p *MyPlugin) Start() error {
+    // 启动后台进程
+    return nil
+}
+
+func (p *MyPlugin) Stop() error {
+    // 清理关闭
+    return nil
+}
+
+func (p *MyPlugin) Uninstall() error {
+    // 移除数据库表并清理资源
+    return nil
+}
+```
+
+## 注册路由
+
+使用 CoreAPI 提供的 **Gin 路由组**注册路由。路由挂载在 `/api/v1/plugins/<plugin-name>/` 路径下：
+
+```go
+func (p *MyPlugin) RegisterRoutes(group *gin.RouterGroup) {
+    group.GET("/items", p.handleListItems)
+    group.POST("/items", p.handleCreateItem)
+    group.GET("/items/:id", p.handleGetItem)
+    group.PUT("/items/:id", p.handleUpdateItem)
+    group.DELETE("/items/:id", p.handleDeleteItem)
+}
+```
+
+认证和授权中间件会自动应用到插件路由。
+
+## 事件总线
+
+### 发布事件
+
+在操作完成时通知其他插件：
+
+```go
+p.core.EventBus().Publish("myplugin.item.created", map[string]interface{}{
+    "id":   item.ID,
+    "name": item.Name,
+})
+```
+
+### 订阅事件
+
+响应其他插件或核心系统的事件：
+
+```go
+p.core.EventBus().Subscribe("container.started", func(payload interface{}) {
+    // 处理容器启动事件
+})
+```
+
+**常用事件订阅：**
+
+| 事件 | 来源 | 负载 |
+|------|------|------|
+| `container.started` | Docker 插件 | 容器 ID、名称 |
+| `container.stopped` | Docker 插件 | 容器 ID、名称 |
+| `host.created` | 反向代理 | 站点 ID、域名 |
+| `backup.completed` | 备份插件 | 备份 ID、大小 |
+| `project.deployed` | 部署插件 | 项目 ID、状态 |
+
+## ConfigStore
+
+使用 **ConfigStore** 持久化插件设置，无需直接访问数据库：
+
+```go
+// 写入设置
+p.core.ConfigStore().Set("myplugin", "api_url", "https://example.com")
+
+// 读取设置
+value := p.core.ConfigStore().Get("myplugin", "api_url")
+```
+
+存储在 ConfigStore 中的设置会自动在 Web.Casa 设置界面中显示，供用户配置。
+
+## CoreAPI 参考
+
+CoreAPI 提供对共享系统服务的访问：
+
+| 服务 | 访问方法 | 用途 |
+|------|---------|------|
+| **数据库** | `api.GetDB()` | GORM 数据库连接 |
+| **事件总线** | `api.EventBus()` | 发布和订阅事件 |
+| **ConfigStore** | `api.ConfigStore()` | 作用域键值设置 |
+| **WebSocket** | `api.WebSocket()` | 向前端实时推送 |
+| **日志记录器** | `api.Logger()` | 结构化日志 |
+| **认证中间件** | `api.AuthMiddleware()` | 为路由添加认证保护 |
+
+## 注册插件
+
+开发完成后，在插件加载器中注册插件，使 Web.Casa 在启动时发现它：
+
+```go
+// 在插件注册文件中
+pluginManager.Register(&myplugin.MyPlugin{})
+```
+
+## 测试
+
+- 为业务逻辑编写单元测试
+- 使用 Go 的 `httptest` 包测试 HTTP 处理器
+- 通过发布模拟事件测试事件订阅
+- 参考现有内置插件作为实现范例
+
+> **提示：** 参阅[架构指南](/zh/contributing/architecture-guide/)了解详细的代码结构规范、命名模式和最佳实践。

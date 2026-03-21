@@ -1,0 +1,98 @@
+---
+title: Plugin System
+description: Understanding Web.Casa's plugin architecture, built-in plugins, and the event bus
+---
+
+Web.Casa is built on a **modular plugin system**. Every major feature is a plugin that registers itself at startup and can be independently enabled, disabled, installed, or uninstalled.
+
+## Built-in Plugins
+
+Web.Casa ships with **12 plugins**:
+
+| Plugin | Description |
+|--------|-------------|
+| **Docker** | Container, image, network, and volume management |
+| **Deploy** | Git-based project deployment with build pipelines |
+| **AI** | LLM integration, chat assistant, and MCP server |
+| **Database** | MySQL, PostgreSQL, and Redis administration |
+| **Monitoring** | Real-time CPU, memory, disk, network metrics and alerts |
+| **Backup** | Kopia-based backup and restore |
+| **App Store** | One-click Docker app installation from catalog |
+| **File Manager** | Web-based file browsing, editing, and management |
+| **Terminal** | Browser-based shell access via xterm.js |
+| **Firewall** | Firewalld zone, port, service, and rich rule management |
+| **PHP** | PHP-FPM and FrankenPHP runtime management |
+| **Notification** | Discord, Telegram, and webhook notification channels |
+
+## Enabling and Disabling Plugins
+
+From the **Plugins** settings page:
+
+1. View all available plugins and their current status
+2. **Enable** a plugin to activate its features
+3. **Disable** a plugin to deactivate it without removing data
+
+> **Warning:** Some changes require a **restart** of Web.Casa to take effect. The UI indicates when a restart is needed.
+
+## Installing and Uninstalling
+
+- **Install** -- downloads and registers a plugin
+- **Uninstall** -- removes the plugin and its associated data
+
+## Plugin Dependencies
+
+Plugins may depend on other plugins. For example:
+
+- The **App Store** plugin depends on **Docker**
+- The **AI** plugin may depend on **Docker** and **Deploy** for full functionality
+
+Web.Casa enforces dependencies automatically:
+- You cannot disable a plugin that other enabled plugins depend on
+- Enabling a plugin with dependencies will prompt you to enable the required plugins first
+
+## Sidebar Visibility
+
+Each plugin can be **shown or hidden** from the sidebar navigation independently of its enabled/disabled state. This lets you keep plugins active in the background without cluttering the sidebar.
+
+## Plugin Interface
+
+All plugins implement a standard interface with lifecycle methods:
+
+| Method | Purpose |
+|--------|---------|
+| **`Init()`** | Registers routes, event handlers, and database tables at startup |
+| **`Start()`** | Activates background processes (collectors, schedulers, watchers) |
+| **`Stop()`** | Cleanly shuts down when the application stops |
+| **`Info()`** | Returns metadata: name, version, description, dependencies |
+| **`Uninstall()`** | Cleans up resources when the plugin is removed |
+
+## Event Bus
+
+The **event bus** is the communication backbone between plugins:
+
+- Plugins **publish** events (e.g., `container.started`, `host.created`, `backup.completed`)
+- Plugins **subscribe** to events from other plugins or the core system
+- No direct dependencies between plugins -- communication is **fully decoupled**
+
+**Example flows:**
+- The Monitoring plugin subscribes to Docker events for container lifecycle tracking
+- The Notification plugin subscribes to alert events to send Discord/Telegram messages
+- The AI plugin subscribes to deployment events to offer diagnostic suggestions
+
+## Scoped Config Store
+
+Each plugin gets a **scoped configuration store** (ConfigStore):
+
+- Read and write settings without colliding with other plugins
+- Settings are accessible through the Web.Casa settings UI
+- Simple key-value interface -- no direct database access needed
+
+## CoreAPI Access
+
+Plugins receive access to the **CoreAPI**, which provides shared utilities:
+
+- **Database** connections and migration helpers
+- **Authentication** middleware
+- **WebSocket** manager for real-time streaming
+- **Event bus** handle for publishing and subscribing
+- **Logger** instance for structured logging

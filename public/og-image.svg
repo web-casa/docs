@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="og-title og-desc">
+  <title id="og-title">Web.Casa Documentation</title>
+  <desc id="og-desc">Open-source server management panel powered by Caddy reverse proxy</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f1f17"/>
+      <stop offset="50%" style="stop-color:#141c18"/>
+      <stop offset="100%" style="stop-color:#113b29"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="20%" cy="40%" r="50%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="80%" cy="60%" r="40%">
+      <stop offset="0%" style="stop-color:#059669;stop-opacity:0.1"/>
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow1)"/>
+  <rect width="1200" height="630" fill="url(#glow2)"/>
+
+  <!-- Grid pattern -->
+  <g opacity="0.04" stroke="#10b981" stroke-width="1">
+    <line x1="0" y1="0" x2="0" y2="630"/><line x1="60" y1="0" x2="60" y2="630"/>
+    <line x1="120" y1="0" x2="120" y2="630"/><line x1="180" y1="0" x2="180" y2="630"/>
+    <line x1="240" y1="0" x2="240" y2="630"/><line x1="300" y1="0" x2="300" y2="630"/>
+    <line x1="360" y1="0" x2="360" y2="630"/><line x1="420" y1="0" x2="420" y2="630"/>
+    <line x1="480" y1="0" x2="480" y2="630"/><line x1="540" y1="0" x2="540" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/><line x1="660" y1="0" x2="660" y2="630"/>
+    <line x1="720" y1="0" x2="720" y2="630"/><line x1="780" y1="0" x2="780" y2="630"/>
+    <line x1="840" y1="0" x2="840" y2="630"/><line x1="900" y1="0" x2="900" y2="630"/>
+    <line x1="960" y1="0" x2="960" y2="630"/><line x1="1020" y1="0" x2="1020" y2="630"/>
+    <line x1="1080" y1="0" x2="1080" y2="630"/><line x1="1140" y1="0" x2="1140" y2="630"/>
+    <line x1="0" y1="60" x2="1200" y2="60"/><line x1="0" y1="120" x2="1200" y2="120"/>
+    <line x1="0" y1="180" x2="1200" y2="180"/><line x1="0" y1="240" x2="1200" y2="240"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/><line x1="0" y1="360" x2="1200" y2="360"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/><line x1="0" y1="480" x2="1200" y2="480"/>
+    <line x1="0" y1="540" x2="1200" y2="540"/>
+  </g>
+
+  <!-- Logo "W" -->
+  <text x="600" y="220" font-family="system-ui, -apple-system, sans-serif" font-size="120" font-weight="700" fill="#10b981" text-anchor="middle" dominant-baseline="middle">W</text>
+
+  <!-- Accent line -->
+  <rect x="500" y="270" width="200" height="3" rx="1.5" fill="#10b981" opacity="0.6"/>
+
+  <!-- Title -->
+  <text x="600" y="340" font-family="system-ui, -apple-system, sans-serif" font-size="64" font-weight="700" fill="#ffffff" text-anchor="middle">Web.Casa</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#a8b9ad" text-anchor="middle">Open-Source Server Management Panel</text>
+
+  <!-- Tags -->
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#728a79">
+    <rect x="295" y="445" width="110" height="34" rx="17" fill="none" stroke="#2d3b34" stroke-width="1"/>
+    <text x="350" y="467" text-anchor="middle">Caddy</text>
+
+    <rect x="425" y="445" width="110" height="34" rx="17" fill="none" stroke="#2d3b34" stroke-width="1"/>
+    <text x="480" y="467" text-anchor="middle">Docker</text>
+
+    <rect x="555" y="445" width="90" height="34" rx="17" fill="none" stroke="#2d3b34" stroke-width="1"/>
+    <text x="600" y="467" text-anchor="middle">AI</text>
+
+    <rect x="665" y="445" width="110" height="34" rx="17" fill="none" stroke="#2d3b34" stroke-width="1"/>
+    <text x="720" y="467" text-anchor="middle">Deploy</text>
+
+    <rect x="795" y="445" width="110" height="34" rx="17" fill="none" stroke="#2d3b34" stroke-width="1"/>
+    <text x="850" y="467" text-anchor="middle">MCP</text>
+  </g>
+
+  <!-- URL -->
+  <text x="600" y="560" font-family="ui-monospace, monospace" font-size="20" fill="#4b5e53" text-anchor="middle">docs.web.casa</text>
+</svg>

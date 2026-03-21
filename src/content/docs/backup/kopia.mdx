@@ -1,0 +1,68 @@
+---
+title: Kopia Backend
+description: Kopia backup engine installation, architecture, and repository management
+---
+
+**Kopia** is the open-source backup engine that powers Web.Casa's backup system. It provides encrypted, deduplicated, incremental backups.
+
+## Installation
+
+Kopia CLI is required for backups to function. Web.Casa offers two installation paths:
+
+1. **Auto-install from panel** -- click the install button in **Backup > Settings** and Web.Casa downloads and configures Kopia automatically.
+2. **Manual install** -- install Kopia CLI yourself via your system's package manager or from the [official Kopia releases](https://github.com/kopia/kopia/releases).
+
+> After installation, Web.Casa detects the Kopia binary automatically. No additional path configuration is needed.
+
+## How Kopia Works
+
+Kopia uses a **content-addressable storage** model:
+
+1. Files are split into **content-defined chunks**.
+2. Each chunk is **compressed** and **encrypted** before storage.
+3. Identical chunks are stored only once (**deduplication**).
+4. Subsequent backups only transfer **new or changed chunks** (incremental).
+
+This architecture makes backups fast and storage-efficient, even for large datasets.
+
+## Repository
+
+A **repository** is the encrypted container where all backup data is stored. It is initialized once when you first configure a backup target.
+
+**Supported repository backends:**
+
+| Backend | Description |
+|---------|-------------|
+| **Local Filesystem** | Directory on a local or mounted disk |
+| **S3 / MinIO** | S3-compatible object storage |
+| **WebDAV** | Network-attached storage or cloud drives |
+| **SFTP** | Remote server via SSH |
+
+> See [Backup Configuration](/backup/configuration/) for detailed setup instructions for each target.
+
+## Encryption
+
+- All backup data is encrypted with **AES-256-GCM** at rest
+- Encryption happens **before** data leaves the server
+- The **repository password** is set during initialization and is required for all future access
+
+> **Save your repository password in a separate, secure location.** If you lose access to Web.Casa, you will need this password to restore backups directly with Kopia CLI. There is no password recovery mechanism.
+
+## Repository Management
+
+From the Web.Casa panel, you can monitor and maintain the repository:
+
+- **Repository statistics** -- total size, snapshot count, deduplication ratio
+- **Integrity verification** -- validate that stored data is uncorrupted
+- **Maintenance tasks** -- compaction and garbage collection to reclaim space
+
+## Integration with Web.Casa
+
+Kopia is managed entirely through the Web.Casa interface. The panel handles:
+
+- **Repository initialization** and connection
+- **Snapshot creation** on schedule or on demand
+- **Retention enforcement** based on your configured policies
+- **Restore operations** from any available snapshot
+
+You do not need to interact with the Kopia CLI directly unless performing advanced troubleshooting.

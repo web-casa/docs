@@ -1,0 +1,203 @@
+---
+title: Container Management
+description: Manage Docker containers and Compose stacks from the Web.Casa panel
+---
+
+Web.Casa provides full Docker container lifecycle management and Compose stack orchestration through an intuitive web interface.
+
+## Installing Docker
+
+If Docker is not yet installed on your server, Web.Casa can install it directly from the panel.
+
+1. Navigate to the **Docker** section in the sidebar.
+2. Click **Install Docker**.
+3. Choose an installation source:
+   - **Default** -- installs from the official Docker repository
+   - **China mirror (DaoCloud)** -- recommended for servers located in mainland China
+
+> After installation completes, the Docker management interface becomes available immediately. No manual configuration is required.
+
+---
+
+## Container List
+
+The container dashboard displays **all running and stopped containers** with key details at a glance:
+
+| Column | Description |
+|--------|-------------|
+| **Name** | Container name (click to open details) |
+| **Image** | Source image and tag |
+| **Status** | Running, stopped, paused, or exited |
+| **Ports** | Host-to-container port mappings |
+| **CPU / Memory** | Real-time resource consumption |
+| **Created** | Container creation timestamp |
+
+- Use the **search bar** to filter by container name or image
+- Containers managed by the App Store are labeled **App Store Managed**
+
+---
+
+## Running a New Container
+
+Click **Run Container** to launch a new container with the following options:
+
+### Basic Settings
+
+- **Name** -- assign a custom container name
+- **Image** -- select from local images or pull a new one
+- **Restart Policy** -- choose from `no`, `always`, `on-failure`, or `unless-stopped`
+- **Network** -- attach the container to an existing Docker network
+- **Command Override** -- override the default entrypoint or CMD
+
+### Port Mappings
+
+Map host ports to container ports:
+
+```
+Host Port : Container Port / Protocol
+8080      : 80             / TCP
+```
+
+Add multiple mappings as needed for services exposing several ports.
+
+### Volume Mounts
+
+Bind host directories or named volumes to paths inside the container:
+
+```
+/host/path/data  →  /container/path/data
+my-named-volume  →  /var/lib/data
+```
+
+### Environment Variables
+
+Define environment variables as **key-value pairs**. These are injected into the container at startup.
+
+### Resource Limits
+
+| Setting | Description |
+|---------|-------------|
+| **Memory limit** | Maximum memory in MB (e.g., `512`) |
+| **CPU limit** | CPU percentage or core allocation |
+
+> Setting resource limits prevents a single container from consuming all server resources. This is especially important in multi-tenant or shared environments.
+
+---
+
+## Container Actions
+
+Each container supports the following operations:
+
+| Action | Description |
+|--------|-------------|
+| **Start** | Start a stopped container |
+| **Stop** | Gracefully stop a running container |
+| **Restart** | Stop and immediately start the container |
+| **Logs** | View real-time stdout/stderr output with timestamp filtering |
+| **Stats** | Monitor live CPU, memory, and network I/O usage |
+| **Remove** | Delete the container (with confirmation prompt) |
+
+### Viewing Logs
+
+The log viewer provides:
+
+- **Real-time streaming** of container output
+- **Timestamp display** for each log line
+- Ability to **scroll through history** or **follow** new output
+
+### Monitoring Stats
+
+The stats panel shows live metrics:
+
+- **CPU usage** -- percentage of allocated CPU
+- **Memory usage** -- current consumption vs. limit
+- **Network I/O** -- bytes sent and received
+
+---
+
+## Compose Stacks
+
+Docker Compose stacks let you define and manage **multi-container applications** as a single unit.
+
+### Creating a Stack
+
+1. Click **Create Stack**.
+2. Provide a **stack name**.
+3. Define your services using the **Compose editor** -- paste or write your `docker-compose.yml` content directly in the browser.
+4. Click **Deploy** to bring up all services.
+
+Web.Casa validates the Compose file structure before deployment and reports any syntax errors.
+
+### Managing Stacks
+
+Once deployed, each stack supports:
+
+- **Start / Stop / Restart** -- control all services in the stack together
+- **Stack Logs** -- view aggregated logs from all services in one stream
+- **Edit & Redeploy** -- modify the Compose file and apply changes
+
+### Example Compose File
+
+```yaml
+version: "3.8"
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+```
+
+> Compose stacks are ideal for deploying full application environments that include a web server, application backend, database, and cache layer.
+
+---
+
+## Docker Daemon Settings
+
+Web.Casa exposes key Docker daemon configuration options through the UI:
+
+### Registry Mirrors
+
+Speed up image pulls by configuring mirror registries:
+
+- Add custom mirror URLs
+- **China mirror presets** -- one-click configuration for popular Chinese Docker mirrors (e.g., Aliyun, Tencent Cloud, USTC)
+
+### Insecure Registries
+
+Register private registries that use HTTP instead of HTTPS. Add the registry address to the insecure registries list.
+
+### Log Configuration
+
+| Setting | Description |
+|---------|-------------|
+| **Log driver** | `json-file`, `syslog`, `journald`, etc. |
+| **Max size** | Maximum size per log file (e.g., `10m`) |
+| **Max files** | Number of rotated log files to retain |
+
+### Other Settings
+
+- **Storage driver** -- configure the Docker storage backend
+- **Live restore** -- keep containers running during Docker daemon restarts
+
+> Changes to daemon settings require a Docker daemon restart. Web.Casa will prompt you to confirm before applying.
+
+---
+
+## Requirements
+
+- **Docker** must be installed on the host (or install it via the panel)
+- When running Web.Casa itself inside Docker, ensure `/var/run/docker.sock` is mounted as a volume

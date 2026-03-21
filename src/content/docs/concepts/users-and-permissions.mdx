@@ -1,0 +1,70 @@
+---
+title: Users & Permissions
+description: Multi-user support, Admin and Viewer roles, first-time setup, and user management
+---
+
+Web.Casa supports multiple user accounts with **role-based access control**. Each user has their own credentials, optional 2FA, and a role that determines what they can access.
+
+## Roles
+
+Web.Casa defines two roles:
+
+| Role | Access Level | Description |
+|------|-------------|-------------|
+| **Admin** | Full control | Unrestricted access to all features and settings |
+| **Viewer** | Read-only | Can view dashboards, configurations, metrics, and logs |
+
+### Admin
+
+Administrators have full access to every feature:
+
+- **Host management** -- create, edit, delete reverse proxy hosts
+- **Certificate management** -- issue, renew, manage SSL/TLS certificates
+- **User management** -- create, edit, delete user accounts and assign roles
+- **System settings** -- configure panel, Caddy, and environment
+- **All plugins** -- Docker, database, backup, monitoring, terminal, file manager, firewall, deploy, AI, app store, MCP
+- **Audit logs** -- view the complete operation history
+
+### Viewer
+
+Viewers have **read-only** access:
+
+- View host configurations and status
+- View system monitoring metrics and dashboards
+- Browse container and database status
+- Read audit logs
+
+Viewers **cannot** create, modify, or delete any resource, manage users, access the web terminal, or change settings.
+
+> **Tip:** Permissions are enforced at the **API level**. Even if a Viewer navigates to a restricted page directly, the backend rejects unauthorized operations with a 403 response.
+
+## First-Time Setup
+
+When Web.Casa starts with an empty database:
+
+1. The setup page is displayed
+2. You create the **first user account** with a username and password
+3. This account is automatically assigned the **Admin** role
+4. Self-registration is disabled after the first account is created
+
+All subsequent users must be created by an administrator through **Settings > Users**.
+
+## User Management
+
+Administrators manage user accounts from **Settings > Users**:
+
+| Action | Description |
+|--------|-------------|
+| **Create** | Add a new user with a chosen username, password, and role |
+| **Edit** | Change a user's password or role |
+| **Delete** | Permanently remove a user account |
+
+**Rules:**
+
+- **You cannot delete your own account** -- this prevents accidental admin lockout
+- Minimum password length is **6 characters**
+- All user management actions are recorded in the [audit log](/security/audit-logging/)
+
+## Two-Factor Authentication
+
+Each user can optionally enable **TOTP 2FA** from their profile settings. See [Authentication & 2FA](/security/authentication/) for setup instructions and recovery code details.

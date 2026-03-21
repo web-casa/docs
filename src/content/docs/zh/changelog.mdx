@@ -1,0 +1,172 @@
+---
+title: 更新日志
+description: Web.Casa 版本历史与发布说明
+---
+
+## v1.0.0 (2026-03-01) — Web.Casa Pro
+
+历经 10 个开发阶段，交付全功能服务器管理平台。
+
+### 🧩 Phase 0：插件系统
+
+- Go Interface 插件架构
+- EventBus 跨插件事件通信
+- ConfigStore 插件配置持久化
+- CoreAPI 插件平台服务访问
+- Frontend Manifests 前端扩展点
+
+### 🐳 Phase 1：Docker 管理
+
+- Compose Stack 管理（创建、启动、停止、删除）
+- 容器生命周期控制
+- 镜像拉取、标签管理、清理
+- 网络与存储卷管理
+- WebSocket 实时容器日志
+
+### 🚀 Phase 2：项目部署
+
+- Git 仓库支持（HTTPS 和 SSH）
+- 9 个框架预设：Next.js、Nuxt、Vite、Remix、Express、Go、Laravel、Flask、Django
+- Systemd 服务生成与管理
+- Webhook 自动化部署触发
+- 版本回滚支持
+
+### 🤖 Phase 3：AI 助手
+
+- 兼容 OpenAI 的 LLM 集成，支持 SSE 流式传输
+- 自动化错误诊断与建议
+- Text-to-Compose：自然语言生成 Docker Compose
+- AES-256-GCM 加密存储 API 密钥
+
+### 📁 Phase 4：文件管理器 + Web 终端
+
+- 树形导航与面包屑路径
+- 文件上传、下载、压缩
+- 基于 CodeMirror 的浏览器内代码编辑器
+- xterm.js PTY 多标签终端
+
+### 🗄️ Phase 5：数据库管理
+
+- 一键创建 MySQL、PostgreSQL、MariaDB、Redis
+- 数据库与用户 CRUD 操作
+- 带语法高亮的 SQL 控制台
+- SQLite 本地数据库浏览器
+
+### 📊 Phase 6：备份 + 监控
+
+- 基于 Kopia 的备份引擎，支持 Local、S3、WebDAV、SFTP
+- Cron 定时调度与保留策略
+- 实时 CPU、内存、磁盘、网络图表
+- 容器资源监控
+- WebSocket 指标流式推送
+- 告警规则支持 Webhook 与邮件通知
+
+### 🛒 Phase 7：应用商店
+
+- 兼容 Runtipi 应用目录
+- 一键安装与应用管理
+- 多源仓库支持
+- 项目模板快速脚手架
+
+### 🔌 Phase 8：MCP Server + API Token
+
+- 18 个 MCP 工具用于 IDE 集成
+- `wc_` 前缀 API Token，SHA-256 哈希存储
+- 支持 Cursor、Windsurf、Claude Code IDE 集成
+
+### ✨ Phase 9：UX 优化
+
+- 侧边栏从 13 项精简至 8 项
+- 设置页面整合
+- 仪表盘卡片布局重设计
+- i18n 修复与改进
+
+### 🔒 安全加固
+
+- AdminRouter JWT 鉴权
+- API Token RBAC 授权
+- MCP 基于 scope 的权限控制
+- 路径穿越防护
+- CORS 严格来源匹配
+- AI 会话隔离
+- WebSocket Origin 头校验
+
+---
+
+## v0.5.1 (2026-02-23)
+
+- 修复 HTTP 环境下 ALTCHA PoW 验证失败
+- 自定义 PowCaptcha 组件替代 Altcha Widget
+- 打包体积从 960KB 降至 895KB
+
+---
+
+## v0.5.0 (2026-02-23)
+
+- ALTCHA Proof-of-Work 替代滑块验证码
+- 无需第三方验证码服务，提升登录安全性
+
+---
+
+## v0.4.x (2026-02-23)
+
+### v0.4.4
+
+- 修复 `install.sh` 在旧发行版上的 GLIBC 版本检测
+
+### v0.4.3
+
+- 修复滑块验证码渲染问题
+- 添加 GLIBC >= 2.32 运行时检查
+
+### v0.4.2
+
+- 修复设置页面初次加载崩溃
+- 修复离线环境下 Web 字体加载
+
+### v0.4.1
+
+- 修复 Radix UI Themes v3 兼容性问题
+- 修复 `install.sh` 管道执行边界情况
+
+### v0.4.0
+
+- 登录限流（失败尝试节流）
+- 滑块验证码登录防护
+- SSL/TLS 证书管理界面
+- 服务器 IP 地址设置
+- 主题系统 CSS 自定义属性
+
+---
+
+## v0.3.x (2026-02-22)
+
+### v0.3.1
+
+- 通过项目根目录 `VERSION` 文件统一版本管理
+
+### v0.3.0
+
+- DNS 提供商：Cloudflare、AliDNS、腾讯云 DNS、Route53
+- TLS 模式：HTTP Challenge、DNS Challenge、自定义证书
+- 响应压缩（Gzip + Zstd）
+- CORS 配置
+- 安全头（HSTS、CSP、X-Frame-Options）
+- 自定义错误页面
+- 缓存控制规则
+- 静态文件与 PHP 托管类型
+- 基于 CodeMirror 的 Caddyfile 编辑器
+
+---
+
+## v0.2.1
+
+- 仪表盘服务器状态概览
+- 多用户支持，RBAC 角色控制（管理员/查看者）
+- 所有管理操作审计日志
+- 主机配置自定义 Caddy 指令
+- 重定向主机类型
+- 自定义 SSL 证书上传
+- HTTP Basic Auth 受保护主机
+- 一键安装脚本（`install.sh`）
+- Caddy 进程生命周期管理（启动、停止、重启、重载）

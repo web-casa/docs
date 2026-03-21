@@ -1,0 +1,54 @@
+---
+title: Web.Casa Documentation
+description: The AI-native open-source server panel powered by Caddy reverse proxy
+template: splash
+hero:
+  title: Web.Casa
+  tagline: The AI-native open-source server panel
+  actions:
+    - text: Get Started
+      link: /getting-started/introduction/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/web-casa/webcasa
+      icon: external
+      variant: minimal
+---
+
+import Card from '../../components/Card.astro';
+import { CardGrid } from '@astrojs/starlight/components';
+
+## Core Capabilities
+
+<CardGrid stagger>
+  <Card title="AI & MCP Integration" icon="star">
+    Your AI co-pilot for server management. Describe what you need in natural language — deploy apps, diagnose errors, generate configurations — and Web.Casa handles the execution. **73 AI tools**, **44 MCP tools**, and seamless integration with **Cursor**, **Windsurf**, and **Claude Code**. Built-in system health inspection and self-healing engine.
+  </Card>
+  <Card title="Reverse Proxy & HTTPS" icon="globe">
+    Manage **reverse proxy**, **301/302 redirects**, **static sites**, and **PHP/FastCGI** hosts through Caddy. Automatic HTTPS via Let's Encrypt, wildcard certificates with DNS challenge (Cloudflare, AliDNS, Tencent Cloud, Route53), custom headers, upstream load balancing, and IP access control — all from a clean web UI.
+  </Card>
+  <Card title="Docker & Deployment" icon="rocket">
+    Full container lifecycle management — **containers**, **Compose stacks**, **images**, **networks**, and **volumes**. Git-based deployment with framework auto-detection and webhook triggers. One-click app installation from the built-in **App Store** (Runtipi-compatible).
+  </Card>
+  <Card title="Databases & Backups" icon="setting">
+    Create and administer **MySQL**, **PostgreSQL**, **MariaDB**, and **Redis** instances with a built-in web SQL console. Schedule automated backups via **Kopia** to local storage, S3, WebDAV, or SFTP targets — with retention policies and one-click restore.
+  </Card>
+</CardGrid>
+
+## More Highlights
+
+<CardGrid>
+  <Card title="Real-Time Monitoring" icon="pulse">
+    Live CPU, memory, disk, and network metrics streamed via WebSocket. Configure threshold-based **alerts** with notification delivery to keep your infrastructure healthy.
+  </Card>
+  <Card title="File Manager & Terminal" icon="document">
+    Browse, upload, download, edit, and compress files from the browser. Open a full **web terminal** (xterm.js + PTY) with multi-tab support — no SSH client needed.
+  </Card>
+  <Card title="Security First" icon="approve-check">
+    Multi-user **RBAC** (Admin / Viewer roles), **TOTP 2FA**, **ALTCHA Proof-of-Work** login protection, JWT authentication, full audit logging, and API token access. Config export/import in JSON format.
+  </Card>
+  <Card title="Plugin Architecture" icon="puzzle">
+    **13 built-in plugins** — Docker, Deploy, AI, Database, Monitoring, Backup, App Store, File Manager & Terminal, Firewall, PHP, MCP Server, and Cron Jobs. Enable only what you need; extend as your requirements grow.
+  </Card>
+</CardGrid>

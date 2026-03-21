@@ -1,0 +1,74 @@
+---
+title: Configuration
+description: Environment variables, configuration file reference, panel settings, and Caddyfile editor
+---
+
+Web.Casa is configured through **environment variables** stored in `/etc/webcasa/webcasa.env`. Settings managed through the web UI (hosts, users, plugins) are stored in the SQLite database.
+
+## Environment File
+
+The primary configuration file is:
+
+```
+/etc/webcasa/webcasa.env
+```
+
+> **Restart required:** After changing environment variables, restart the Web.Casa service with `systemctl restart webcasa` for changes to take effect.
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `WEBCASA_PORT` | `39921` | Panel listening port |
+| `WEBCASA_DATA_DIR` | `./data` | Data directory for database, certs, and backups |
+| `WEBCASA_DB_PATH` | `data/webcasa.db` | SQLite database file path |
+| `WEBCASA_JWT_SECRET` | -- | **Required.** Secret key for signing JWT authentication tokens |
+| `WEBCASA_CADDY_BIN` | `caddy` | Path to the Caddy binary |
+| `WEBCASA_CADDYFILE_PATH` | `data/Caddyfile` | Path for the generated Caddyfile |
+| `WEBCASA_LOG_DIR` | `data/logs` | Directory for log files |
+
+> **Warning:** `WEBCASA_JWT_SECRET` has no default value and **must be set** before starting Web.Casa. Use a strong, random string (32+ characters recommended).
+
+## Configuration Precedence
+
+Web.Casa reads configuration in this order (later sources override earlier ones):
+
+1. **Built-in defaults**
+2. **Environment file** (`/etc/webcasa/webcasa.env`)
+3. **Environment variables** (set in the shell or systemd unit override)
+
+You only need to specify values you want to change from the defaults.
+
+## Panel Settings
+
+Additional settings are managed through the **Settings** page in the web UI:
+
+- **Auto-reload Caddy** -- automatically apply Caddy configuration changes without manual reload
+- **Server IP configuration** -- set the server's public IP for DNS and certificate operations
+- **Import/Export** -- backup and restore panel configuration as JSON
+- **Caddyfile editor** -- built-in code editor powered by **CodeMirror 6** with:
+  - Syntax highlighting
+  - **Format** -- auto-format the Caddyfile
+  - **Validate** -- check for configuration errors
+  - **Save** -- persist changes
+  - **Reload** -- apply changes to the running Caddy instance
+
+## Key File Paths
+
+| Path | Purpose |
+|------|---------|
+| `/etc/webcasa/webcasa.env` | Environment configuration file |
+| `/var/lib/webcasa/webcasa.db` | SQLite database (WAL mode) |
+| `/var/lib/webcasa/` | Data directory (certs, backups, uploads) |
+
+## What Lives in the Database
+
+The following settings are managed through the web UI and stored in SQLite -- not in configuration files:
+
+- Reverse proxy host definitions
+- DNS provider credentials
+- User accounts and roles
+- Certificate records
+- Backup schedules
+- Plugin-specific settings
+- Audit log entries

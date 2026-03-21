@@ -1,0 +1,87 @@
+---
+title: Monitoring
+description: Real-time system monitoring with CPU, memory, disk, and network metrics
+---
+
+Web.Casa provides **real-time system monitoring** delivered to your browser over WebSocket. Metrics update live with no polling overhead, giving you instant visibility into server health.
+
+## Dashboard Metrics
+
+The monitoring dashboard displays the following metrics in real time:
+
+| Metric | Details |
+|--------|---------|
+| **CPU** | Per-core utilization, overall usage percentage, load average |
+| **Memory** | Total, used, available, cached; consumption breakdown |
+| **Swap** | Swap usage and availability |
+| **Disk** | Capacity and free space per mount point |
+| **Disk I/O** | Read/write throughput (bytes/sec) |
+| **Network I/O** | Sent/received traffic per interface |
+| **Load Average** | 1-minute, 5-minute, and 15-minute averages |
+
+## Container Metrics
+
+For each running **Docker container**, the monitoring plugin collects:
+
+- **CPU usage** per container
+- **Memory consumption** per container
+- **Network I/O** (sent/received) per container
+
+This helps you quickly identify which containers are consuming the most resources.
+
+## Historical Charts
+
+Metrics are retained and can be viewed over multiple time ranges:
+
+- **1 hour** -- fine-grained, second-level resolution
+- **6 hours** -- short-term trend analysis
+- **24 hours** -- daily patterns and peak detection
+- **7 days** -- weekly usage trends
+- **30 days** -- long-term capacity planning
+
+Charts support zooming and panning to inspect specific time windows.
+
+## WebSocket Real-Time Connection
+
+Monitoring data is streamed via **WebSocket**, providing:
+
+- **Low-latency updates** -- metrics arrive in real time without repeated HTTP requests
+- **Efficient transport** -- a single persistent connection replaces constant polling
+- **Smooth rendering** -- the browser draws live-updating charts with minimal delay
+
+## Alert Rules
+
+Set up alert rules to get notified when metrics cross defined thresholds.
+
+### Configuring an Alert
+
+Each alert rule consists of:
+
+1. **Metric** -- the metric to watch (CPU, memory, disk, network, load average, swap)
+2. **Operator** -- comparison operator (greater than, less than, equal to)
+3. **Threshold** -- the value that triggers the alert
+4. **Duration** -- how long the condition must persist before firing (e.g., 5 minutes)
+5. **Cooldown** -- minimum interval between repeated alerts for the same rule
+
+> **Tip:** Set a cooldown period to avoid alert fatigue. For example, a 15-minute cooldown prevents the same CPU alert from firing every minute during sustained load.
+
+### Notification Channels
+
+Alerts can be delivered through:
+
+| Channel | Use Case |
+|---------|----------|
+| **Discord** | Team chat notifications via webhook |
+| **Telegram** | Bot messages to a chat or group |
+| **Webhook** | Custom HTTP endpoint for integration with any system |
+
+### Alert History
+
+All triggered alerts are recorded in the **Alert History** view, showing:
+
+- Which rule fired
+- The metric value at the time of firing
+- Timestamp
+- Notification delivery status
+
+> **Warning:** Monitoring requires the Monitoring plugin to be enabled. If you do not see monitoring data, verify the plugin is active under **Plugins** settings.
