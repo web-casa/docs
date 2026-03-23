@@ -40,6 +40,7 @@ export default defineConfig({
       components: {
         Head: './src/components/Head.astro',
         Hero: './src/components/Hero.astro',
+        SiteTitle: './src/components/SiteTitle.astro',
       },
       head: [
         // og:image for social sharing

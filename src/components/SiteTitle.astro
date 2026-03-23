@@ -1,0 +1,70 @@
+---
+/**
+ * Override Starlight's SiteTitle to add main site navigation links
+ * next to the docs logo.
+ */
+const { lang } = Astro.locals.starlightRoute;
+const isZh = lang === 'zh-CN';
+
+const navItems = [
+  { label: isZh ? '首页' : 'Home', href: isZh ? '/zh' : '/en' },
+  { label: isZh ? '功能' : 'Features', href: isZh ? '/zh#features' : '/en#features' },
+  { label: 'AI-Native', href: isZh ? '/zh/ai-native' : '/en/ai-native' },
+  { label: isZh ? '插件' : 'Plugins', href: isZh ? '/zh#plugins' : '/en#plugins' },
+  { label: isZh ? '应用商店' : 'App Store', href: isZh ? '/zh/apps' : '/en/apps' },
+  { label: isZh ? '文档' : 'Docs', href: '/docs/' },
+  { label: 'Demo', href: 'https://demo.web.casa' },
+];
+---
+
+<a href="/docs/" class="site-title sl-flex astro-m46x6ez3">
+  <img class="astro-m46x6ez3" alt="" src="/docs/_astro/logo.BX11vEVy.png" width="512" height="512" style="width:1.5rem;height:1.5rem;" />
+  <span class="astro-m46x6ez3" translate="no">Web.Casa Docs</span>
+</a>
+
+<nav class="site-nav">
+  {navItems.map(({ label, href }) => (
+    <a
+      href={href}
+      class:list={["site-nav-link", { active: href === '/docs/' }]}
+      {...(href.startsWith('https') ? { target: '_blank', rel: 'noreferrer nofollow' } : {})}
+    >
+      {label}
+    </a>
+  ))}
+</nav>
+
+<style>
+  .site-nav {
+    display: none;
+    align-items: center;
+    gap: 0.25rem;
+    margin-inline-start: 1rem;
+  }
+
+  .site-nav-link {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  .site-nav-link:hover {
+    color: var(--sl-color-white);
+    background: var(--sl-color-gray-6);
+  }
+
+  .site-nav-link.active {
+    color: var(--sl-color-accent);
+    font-weight: 500;
+  }
+
+  @media (min-width: 72rem) {
+    .site-nav {
+      display: flex;
+    }
+  }
+</style>
