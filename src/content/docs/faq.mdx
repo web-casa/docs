@@ -14,15 +14,14 @@ Web.Casa is a modern server management panel built on **Caddy** (not Nginx). Unl
 
 ## Which Linux distributions are supported?
 
-Web.Casa supports 10+ mainstream Linux distributions:
+Web.Casa supports EL9/EL10 (RHEL-based) distributions only. Debian/Ubuntu (deb-based) distributions are **not** supported.
 
-- **Ubuntu** 20.04+
-- **Debian** 11+
-- **CentOS Stream** 8+
-- **AlmaLinux** 8+
-- **Fedora** 38+
-- **openAnolis**
-- **Alibaba Cloud Linux**
+- **AlmaLinux** 9+
+- **Rocky Linux** 9+
+- **CentOS Stream** 9+
+- **RHEL** 9+
+- **Oracle Linux** 9+
+- **Fedora** 41+
 - **openEuler**
 - **openCloudOS**
 - **Kylin**
@@ -39,7 +38,7 @@ Set the `WEBCASA_PORT` environment variable in the configuration file, or pass `
 
 ```bash
 # During installation
-curl -fsSL https://get.web.casa | bash -s -- --port 9090
+curl -fsSL https://raw.githubusercontent.com/web-casa/webcasa/main/install.sh | bash -s -- --port 9090
 
 # After installation, edit the env file
 sudo nano /etc/webcasa/webcasa.env
@@ -78,11 +77,11 @@ All user actions are recorded in the audit log for accountability.
 
 ## What LLM providers does the AI assistant support?
 
-The AI assistant works with any **OpenAI-compatible** API endpoint. This includes OpenAI, Azure OpenAI, Anthropic (via compatible proxies), Ollama, and other local or cloud LLM providers. Configure your API endpoint and key in **Settings > AI Assistant**. API keys are encrypted with AES-256-GCM at rest.
+The AI assistant natively supports **OpenAI**, **Anthropic** (Claude), and **Google Generative AI** (Gemini) APIs, as well as **DeepSeek**, **Moonshot/Kimi**, and **Zhipu/GLM**. Any OpenAI-compatible endpoint (Azure OpenAI, Ollama, etc.) also works. Configure your provider, API endpoint, and key in **Settings > AI Assistant**. API keys are encrypted with AES-256-GCM at rest.
 
 ## How do I integrate with Claude Code / Cursor?
 
-Web.Casa includes an MCP Server plugin with 18 tools for IDE integration:
+Web.Casa includes an MCP Server plugin with 44 tools for IDE integration:
 
 1. Enable the **MCP Server** plugin in Settings
 2. Generate an API token (prefixed with `wc_`) in **Settings > API Tokens**
@@ -92,7 +91,7 @@ Web.Casa includes an MCP Server plugin with 18 tools for IDE integration:
 {
   "mcpServers": {
     "webcasa": {
-      "url": "https://your-server:port/api/mcp/sse",
+      "url": "https://your-server:port/api/plugins/mcpserver/mcp",
       "headers": {
         "Authorization": "Bearer wc_your_token_here"
       }
@@ -105,7 +104,7 @@ Compatible with Cursor, Windsurf, and Claude Code.
 
 ## Is Web.Casa production-ready?
 
-Yes. Web.Casa v1.0.0 has been released with comprehensive security hardening including JWT authentication, RBAC authorization, path traversal protection, CORS strict matching, and WebSocket origin validation. It is licensed under MIT and actively used in production environments.
+Yes. Web.Casa v0.9.3 has been released with comprehensive security hardening including JWT authentication, RBAC authorization, path traversal protection, CORS strict matching, and WebSocket origin validation. It is licensed under MIT and actively used in production environments.
 
 ## How do I upgrade?
 
@@ -113,10 +112,10 @@ Run the install script with the `--upgrade` flag:
 
 ```bash
 # Standard upgrade (downloads pre-built binary)
-curl -fsSL https://get.web.casa | bash -s -- --upgrade
+curl -fsSL https://raw.githubusercontent.com/web-casa/webcasa/main/install.sh | bash -s -- --upgrade
 
 # Upgrade from source (builds locally)
-curl -fsSL https://get.web.casa | bash -s -- --upgrade-from-source
+curl -fsSL https://raw.githubusercontent.com/web-casa/webcasa/main/install.sh | bash -s -- --upgrade-from-source
 ```
 
 Your configuration and data are preserved during upgrades.
@@ -127,10 +126,10 @@ The install script supports two uninstall modes:
 
 ```bash
 # Clean uninstall (removes binary and service, keeps data)
-curl -fsSL https://get.web.casa | bash -s -- --uninstall
+curl -fsSL https://raw.githubusercontent.com/web-casa/webcasa/main/install.sh | bash -s -- --uninstall
 
 # Complete purge (removes everything including data and config)
-curl -fsSL https://get.web.casa | bash -s -- --purge
+curl -fsSL https://raw.githubusercontent.com/web-casa/webcasa/main/install.sh | bash -s -- --purge
 ```
 
 The `--purge` option removes all data under `/etc/webcasa/` and the systemd service files.

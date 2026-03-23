@@ -65,7 +65,7 @@ Web.Casa implements the **Model Context Protocol (MCP)** using HTTP Streamable t
 | **Transport** | HTTP Streamable (SSE for streaming responses) |
 | **Authentication** | Bearer token (`wc_` prefixed API tokens) |
 | **Authorization** | Scope-based — tokens inherit the creating user's permissions |
-| **Endpoint** | `https://your-server.com/api/mcp` |
+| **Endpoint** | `https://your-server.com/api/plugins/mcpserver/mcp` |
 
 The MCP server exposes **44 tools** — a curated subset of the 73 AI tools. External clients discover available tools through the MCP protocol's tool listing capability, then invoke them with structured parameters.
 

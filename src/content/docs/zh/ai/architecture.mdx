@@ -65,7 +65,7 @@ Web.Casa 使用 HTTP Streamable 传输实现 **Model Context Protocol（MCP）**
 | **传输** | HTTP Streamable（SSE 用于流式响应） |
 | **认证** | Bearer Token（`wc_` 前缀的 API Token） |
 | **授权** | 基于范围 — Token 继承创建者的权限 |
-| **端点** | `https://your-server.com/api/mcp` |
+| **端点** | `https://your-server.com/api/plugins/mcpserver/mcp` |
 
 MCP 服务器暴露 **44 个工具** — AI 助手 73 个工具的精选子集。外部客户端通过 MCP 协议的工具发现能力列出可用工具，然后使用结构化参数调用。
 

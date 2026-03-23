@@ -3,7 +3,7 @@ title: SSL/TLS Certificates
 description: Automatic certificate provisioning, custom uploads, and certificate management
 ---
 
-Web.Casa leverages Caddy's built-in ACME client to provision and renew SSL/TLS certificates automatically. Every host can be configured with one of **six TLS modes** to match your deployment scenario.
+Web.Casa leverages Caddy's built-in ACME client to provision and renew SSL/TLS certificates automatically. Every host can be configured with one of **five TLS modes** to match your deployment scenario.
 
 ## TLS Modes
 
@@ -14,7 +14,6 @@ Web.Casa leverages Caddy's built-in ACME client to provision and renew SSL/TLS c
 | **Wildcard (DNS)** | Issues a single certificate for `*.example.com` via DNS challenge | Multiple subdomains under one cert |
 | **Custom Certificate** | Uses your own uploaded `.pem`/`.crt` + `.key` files | Commercial CA certs, internal PKI |
 | **Off** | Serves the host over **HTTP only** -- no TLS | Local development, internal services |
-| **Internal** | Generates a **self-signed** certificate | Testing, internal tools behind VPN |
 
 ## Auto Mode (Default)
 
@@ -76,14 +75,6 @@ For certificates issued by a commercial CA or internal PKI:
 Set the TLS mode to **Off** to serve a host over plain HTTP. This disables all TLS handling for the host.
 
 > Only use this for local development or internal services that are not exposed to the internet. Traffic is **unencrypted**.
-
-## Internal (Self-Signed) Mode
-
-The **Internal** mode generates a self-signed certificate. Browsers will show a security warning, but the connection is still encrypted. Useful for:
-
-- Internal tools behind a VPN
-- Development and testing environments
-- Services where browser trust is not required
 
 ## Certificate Management
 

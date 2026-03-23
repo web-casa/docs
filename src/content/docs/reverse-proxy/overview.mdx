@@ -31,7 +31,7 @@ All host configurations are persisted in the Web.Casa **SQLite database** and ke
 
 Every host -- regardless of type -- can be configured with:
 
-- **TLS / SSL** -- Six modes: Auto (ACME), DNS Challenge, Wildcard (DNS), Custom Certificate, Off (HTTP only), Internal (self-signed)
+- **TLS / SSL** -- Five modes: Auto (ACME), DNS Challenge, Wildcard (DNS), Custom Certificate, Off (HTTP only)
 - **WebSocket support** -- Proxy WebSocket connections to upstream servers
 - **Compression** -- Gzip and Zstd compression for responses
 - **Security headers** -- `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection`
@@ -49,12 +49,12 @@ Every host -- regardless of type -- can be configured with:
 
 Web.Casa includes **preset templates** to accelerate common setups:
 
-- **WordPress** -- PHP-FPM with WordPress-optimized rules
-- **SPA** (Single Page Application) -- Static site with fallback routing
-- **API** -- Reverse proxy tuned for API backends
-- **PHP-FPM** -- Generic PHP FastCGI configuration
-- **Static File Server** -- Directory serving with optional index files
-- **WebSocket** -- Reverse proxy with WebSocket pass-through
+- **WordPress Reverse Proxy** -- PHP-FPM with WordPress-optimized rules
+- **SPA Static Site** (Single Page Application) -- Static site with fallback routing
+- **API Reverse Proxy** -- Reverse proxy tuned for API backends
+- **PHP-FPM Site** -- Generic PHP FastCGI configuration
+- **Static File Download Site** -- Directory serving with optional index files
+- **WebSocket Application** -- Reverse proxy with WebSocket pass-through
 
 Templates pre-fill host settings that you can customize before saving.
 

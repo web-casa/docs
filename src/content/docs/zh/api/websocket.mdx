@@ -1,6 +1,6 @@
 ---
 title: WebSocket API
-description: 实时终端会话、监控数据推送、部署日志流和容器日志流的 WebSocket 接口
+description: 实时终端会话、监控数据推送和容器日志流的 WebSocket 接口
 ---
 
 Web.Casa 使用 **WebSocket** 提供实时双向通信能力。所有 WebSocket 连接使用与 REST API 相同的 JWT 令牌进行认证。
@@ -10,7 +10,7 @@ Web.Casa 使用 **WebSocket** 提供实时双向通信能力。所有 WebSocket 
 在建立 WebSocket 连接时，通过**查询参数**传递 JWT 令牌：
 
 ```
-ws://your-server:39921/ws/terminal?token=<jwt-token>
+ws://your-server:39921/api/plugins/filemanager/terminal/ws?token=<jwt-token>
 ```
 
 > **重要：** WebSocket 连接同样受 [RBAC](/zh/security/rbac/) 权限控制。查看者角色的令牌无法访问仅限管理员的 WebSocket 端点（如终端）。
@@ -19,7 +19,7 @@ ws://your-server:39921/ws/terminal?token=<jwt-token>
 
 ### 终端（PTY）
 
-**`/ws/terminal`**
+**`/api/plugins/filemanager/terminal/ws`**
 
 提供完整的 **PTY 访问**，前端由 [xterm.js](https://xtermjs.org/) 驱动，实现网页终端功能。
 
@@ -40,7 +40,7 @@ ws://your-server:39921/ws/terminal?token=<jwt-token>
 
 ### 监控（实时指标）
 
-**`/ws/monitor`**
+**`/api/plugins/monitoring/metrics/ws`**
 
 实时向连接的客户端推送系统指标数据。
 
@@ -54,19 +54,9 @@ ws://your-server:39921/ws/terminal?token=<jwt-token>
 - 服务端定时推送 JSON 消息
 - 相比 REST 轮询，延迟更低、开销更小
 
-### 部署（构建日志流）
-
-**`/ws/deploy`**
-
-在基于 Git 的部署过程中实时推送构建和部署日志。
-
-- 客户端实时接收构建过程产生的日志行
-- 在 `git pull`、依赖安装和构建步骤中提供实时反馈
-- 部署完成或失败时连接自动关闭
-
 ### Docker（容器日志流）
 
-**`/ws/docker/logs/:id`**
+**`/api/plugins/docker/containers/:id/logs`**
 
 实时推送容器的 stdout/stderr 输出，等效于 `docker logs -f`。
 

@@ -22,12 +22,12 @@ Web.Casa 通过存储在 `/etc/webcasa/webcasa.env` 中的**环境变量**进行
 | `WEBCASA_PORT` | `39921` | 面板监听端口 |
 | `WEBCASA_DATA_DIR` | `./data` | 数据目录，存放数据库、证书和备份 |
 | `WEBCASA_DB_PATH` | `data/webcasa.db` | SQLite 数据库文件路径 |
-| `WEBCASA_JWT_SECRET` | -- | **必填。** JWT 认证令牌的签名密钥 |
+| `WEBCASA_JWT_SECRET` | 自动生成 | JWT 认证令牌的签名密钥。未设置时自动生成并持久化到 `data/.jwt_secret` |
 | `WEBCASA_CADDY_BIN` | `caddy` | Caddy 二进制文件路径 |
 | `WEBCASA_CADDYFILE_PATH` | `data/Caddyfile` | 生成的 Caddyfile 路径 |
 | `WEBCASA_LOG_DIR` | `data/logs` | 日志文件目录 |
 
-> **警告：** `WEBCASA_JWT_SECRET` 没有默认值，**必须在启动 Web.Casa 前设置**。建议使用高强度随机字符串（推荐 32 个字符以上）。
+> **说明：** 如未设置 `WEBCASA_JWT_SECRET`，Web.Casa 会自动生成随机密钥并持久化到 `data/.jwt_secret`。您也可以通过显式设置环境变量来覆盖，建议使用高强度随机字符串（推荐 32 个字符以上）。
 
 ## 配置优先级
 

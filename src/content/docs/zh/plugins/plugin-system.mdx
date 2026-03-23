@@ -13,16 +13,16 @@ Web.Casa 内置 **12 个插件**：
 |------|------|
 | **Docker** | 容器、镜像、网络和卷管理 |
 | **Deploy** | 基于 Git 的项目部署和构建流水线 |
-| **AI** | LLM 集成、聊天助手和 MCP 服务器 |
+| **AI** | LLM 集成和聊天助手 |
 | **Database** | MySQL、PostgreSQL、Redis 管理 |
 | **Monitoring** | 实时 CPU、内存、磁盘、网络指标和告警 |
 | **Backup** | 基于 Kopia 的备份与恢复 |
 | **App Store** | 从目录一键安装 Docker 应用 |
 | **File Manager** | Web 文件浏览、编辑和管理 |
-| **Terminal** | 基于 xterm.js 的浏览器终端 |
 | **Firewall** | Firewalld 区域、端口、服务和富规则管理 |
 | **PHP** | PHP-FPM 和 FrankenPHP 运行时管理 |
-| **Notification** | Discord、Telegram 和 Webhook 通知渠道 |
+| **MCP Server** | Model Context Protocol 服务器，用于 AI 工具集成 |
+| **Cron Job** | 定时任务管理 |
 
 ## 启用和禁用插件
 
@@ -60,11 +60,10 @@ Web.Casa 自动管理依赖：
 
 | 方法 | 用途 |
 |------|------|
+| **`Metadata()`** | 返回元数据：名称、版本、描述、依赖 |
 | **`Init()`** | 启动时注册路由、事件处理器和数据库表 |
 | **`Start()`** | 启动后台进程（采集器、调度器、监视器） |
 | **`Stop()`** | 应用停止时清理关闭 |
-| **`Info()`** | 返回元数据：名称、版本、描述、依赖 |
-| **`Uninstall()`** | 插件被移除时清理资源 |
 
 ## 事件总线
 

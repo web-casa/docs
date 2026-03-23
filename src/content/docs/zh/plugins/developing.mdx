@@ -14,10 +14,10 @@ description: 创建自定义 Web.Casa 插件的完整指南，包括 Plugin 接�
 
 ## 项目结构
 
-在 `internal/plugins/` 下创建以插件名命名的目录：
+在 `plugins/`（项目根目录）下创建以插件名命名的目录：
 
 ```
-internal/plugins/myplugin/
+plugins/myplugin/
   myplugin.go       # 插件结构体和生命周期方法
   handler.go        # HTTP 处理器
   service.go        # 业务逻辑
@@ -30,12 +30,12 @@ internal/plugins/myplugin/
 
 ```go
 type MyPlugin struct {
-    core *core.API
-    db   *gorm.DB
+    ctx *plugin.Context
+    db  *gorm.DB
 }
 
-func (p *MyPlugin) Info() core.PluginInfo {
-    return core.PluginInfo{
+func (p *MyPlugin) Metadata() plugin.Metadata {
+    return plugin.Metadata{
         Name:         "myplugin",
         Version:      "1.0.0",
         Description:  "我的自定义插件",
@@ -43,9 +43,9 @@ func (p *MyPlugin) Info() core.PluginInfo {
     }
 }
 
-func (p *MyPlugin) Init(api *core.API) error {
-    p.core = api
-    p.db = api.GetDB()
+func (p *MyPlugin) Init(ctx *plugin.Context) error {
+    p.ctx = ctx
+    p.db = ctx.DB
     // 自动迁移数据库表
     // 注册事件订阅
     return nil
@@ -60,16 +60,11 @@ func (p *MyPlugin) Stop() error {
     // 清理关闭
     return nil
 }
-
-func (p *MyPlugin) Uninstall() error {
-    // 移除数据库表并清理资源
-    return nil
-}
 ```
 
 ## 注册路由
 
-使用 CoreAPI 提供的 **Gin 路由组**注册路由。路由挂载在 `/api/v1/plugins/<plugin-name>/` 路径下：
+使用 CoreAPI 提供的 **Gin 路由组**注册路由。路由挂载在 `/api/plugins/<plugin-name>/` 路径下：
 
 ```go
 func (p *MyPlugin) RegisterRoutes(group *gin.RouterGroup) {
@@ -90,7 +85,7 @@ func (p *MyPlugin) RegisterRoutes(group *gin.RouterGroup) {
 在操作完成时通知其他插件：
 
 ```go
-p.core.EventBus().Publish("myplugin.item.created", map[string]interface{}{
+p.ctx.EventBus.Publish("myplugin.item.created", map[string]interface{}{
     "id":   item.ID,
     "name": item.Name,
 })
@@ -101,7 +96,7 @@ p.core.EventBus().Publish("myplugin.item.created", map[string]interface{}{
 响应其他插件或核心系统的事件：
 
 ```go
-p.core.EventBus().Subscribe("container.started", func(payload interface{}) {
+p.ctx.EventBus.Subscribe("container.started", func(e plugin.Event) {
     // 处理容器启动事件
 })
 ```
@@ -122,26 +117,24 @@ p.core.EventBus().Subscribe("container.started", func(payload interface{}) {
 
 ```go
 // 写入设置
-p.core.ConfigStore().Set("myplugin", "api_url", "https://example.com")
+p.ctx.ConfigStore.Set("myplugin", "api_url", "https://example.com")
 
 // 读取设置
-value := p.core.ConfigStore().Get("myplugin", "api_url")
+value := p.ctx.ConfigStore.Get("myplugin", "api_url")
 ```
 
 存储在 ConfigStore 中的设置会自动在 Web.Casa 设置界面中显示，供用户配置。
 
-## CoreAPI 参考
+## 插件 Context 参考
 
-CoreAPI 提供对共享系统服务的访问：
+插件 Context 提供对共享系统服务的访问：
 
 | 服务 | 访问方法 | 用途 |
 |------|---------|------|
-| **数据库** | `api.GetDB()` | GORM 数据库连接 |
-| **事件总线** | `api.EventBus()` | 发布和订阅事件 |
-| **ConfigStore** | `api.ConfigStore()` | 作用域键值设置 |
-| **WebSocket** | `api.WebSocket()` | 向前端实时推送 |
-| **日志记录器** | `api.Logger()` | 结构化日志 |
-| **认证中间件** | `api.AuthMiddleware()` | 为路由添加认证保护 |
+| **数据库** | `ctx.DB` | GORM 数据库连接 |
+| **事件总线** | `ctx.EventBus` | 发布和订阅事件 |
+| **ConfigStore** | `ctx.ConfigStore` | 作用域键值设置 |
+| **日志记录器** | `ctx.Logger` | 结构化日志 |
 
 ## 注册插件
 

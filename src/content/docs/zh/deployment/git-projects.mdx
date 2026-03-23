@@ -63,19 +63,21 @@ Web.Casa 支持三种私有仓库认证方式：
 
 ## 框架检测
 
-克隆完成后，Web.Casa 自动分析仓库并检测框架。当前支持 **9 种框架**：
+克隆完成后，Web.Casa 自动分析仓库并检测框架。当前支持 **11 种框架**：
 
 | 框架 | 检测方式 |
 |------|---------|
 | **Next.js** | `package.json` 依赖中包含 `next` |
 | **Nuxt** | `package.json` 依赖中包含 `nuxt` |
 | **Vite** | `package.json` devDependencies 中包含 `vite` |
-| **Create React App** | 依赖中包含 `react-scripts` |
-| **Astro** | `package.json` 依赖中包含 `astro` |
-| **Django** | 存在 `manage.py` 和 `requirements.txt` |
-| **Flask** | `requirements.txt` 中包含 `flask` |
-| **FastAPI** | `requirements.txt` 中包含 `fastapi` |
+| **Remix** | `package.json` 依赖中包含 `remix` |
+| **Express.js** | `package.json` 依赖中包含 `express` |
 | **Go** | 项目根目录存在 `go.mod` |
+| **Laravel** | `composer.json` 中包含 `laravel/framework` |
+| **Flask** | `requirements.txt` 中包含 `flask` |
+| **Django** | 存在 `manage.py` 和 `requirements.txt` |
+| **Dockerfile** | 项目根目录存在 `Dockerfile` |
+| **Custom** | 手动配置 |
 
 基于检测到的框架，Web.Casa 自动推荐：
 

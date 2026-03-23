@@ -50,16 +50,18 @@ Authorization: Bearer <token>
 
 | 插件 | 基础路径 | 主要操作 |
 |------|---------|---------|
-| **Docker** | `/api/docker/*` | 容器和 Compose 栈管理 |
-| **部署** | `/api/deploy/*` | 基于 Git 的部署和构建触发 |
-| **AI** | `/api/ai/*` | AI 助手交互 |
-| **数据库** | `/api/database/*` | MySQL/PostgreSQL 数据库和用户管理 |
-| **监控** | `/api/monitoring/*` | 系统指标和资源使用情况 |
-| **备份** | `/api/backup/*` | 定时和手动备份操作 |
-| **应用商店** | `/api/appstore/*` | 一键应用目录和安装 |
-| **文件管理** | `/api/files/*` | 文件浏览、上传、下载、编辑 |
-| **防火墙** | `/api/firewall/*` | 防火墙规则管理 |
-| **MCP** | `/api/mcp/*` | Model Context Protocol 服务端点 |
+| **Docker** | `/api/plugins/docker/*` | 容器和 Compose 栈管理 |
+| **部署** | `/api/plugins/deploy/*` | 基于 Git 的部署和构建触发 |
+| **AI** | `/api/plugins/ai/*` | AI 助手交互 |
+| **数据库** | `/api/plugins/database/*` | MySQL/PostgreSQL 数据库和用户管理 |
+| **监控** | `/api/plugins/monitoring/*` | 系统指标和资源使用情况 |
+| **备份** | `/api/plugins/backup/*` | 定时和手动备份操作 |
+| **应用商店** | `/api/plugins/appstore/*` | 一键应用目录和安装 |
+| **文件管理** | `/api/plugins/filemanager/*` | 文件浏览、上传、下载、编辑 |
+| **防火墙** | `/api/plugins/firewall/*` | 防火墙规则管理 |
+| **MCP Server** | `/api/plugins/mcpserver/*` | Model Context Protocol 服务端点 |
+| **PHP** | `/api/plugins/php/*` | PHP-FPM 和 FrankenPHP 运行时管理 |
+| **定时任务** | `/api/plugins/cronjob/*` | 定时任务管理 |
 
 ## 请求示例
 

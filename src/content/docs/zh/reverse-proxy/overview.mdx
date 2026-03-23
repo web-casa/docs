@@ -31,7 +31,7 @@ Web.Casa 支持四种站点类型，适用于不同场景：
 
 每个站点（无论类型）均可配置以下功能：
 
-- **TLS / SSL** -- 六种模式：自动（ACME）、DNS 验证、通配符（DNS）、自定义证书、关闭（仅 HTTP）、内部（自签名）
+- **TLS / SSL** -- 五种模式：自动（ACME）、DNS 验证、通配符（DNS）、自定义证书、关闭（仅 HTTP）
 - **WebSocket 支持** -- 代理 WebSocket 连接到上游服务器
 - **压缩** -- 支持 Gzip 和 Zstd 响应压缩
 - **安全头** -- `X-Frame-Options`、`X-Content-Type-Options`、`X-XSS-Protection`
@@ -49,12 +49,12 @@ Web.Casa 支持四种站点类型，适用于不同场景：
 
 Web.Casa 内置**预设模板**，帮助快速完成常见配置：
 
-- **WordPress** -- 针对 WordPress 优化的 PHP-FPM 规则
-- **SPA**（单页应用） -- 静态站点 + 回退路由
-- **API** -- 针对 API 后端优化的反向代理
-- **PHP-FPM** -- 通用 PHP FastCGI 配置
-- **静态文件服务器** -- 目录服务 + 可选索引文件
-- **WebSocket** -- 支持 WebSocket 透传的反向代理
+- **WordPress Reverse Proxy** -- 针对 WordPress 优化的 PHP-FPM 规则
+- **SPA Static Site**（单页应用） -- 静态站点 + 回退路由
+- **API Reverse Proxy** -- 针对 API 后端优化的反向代理
+- **PHP-FPM Site** -- 通用 PHP FastCGI 配置
+- **Static File Download Site** -- 目录服务 + 可选索引文件
+- **WebSocket Application** -- 支持 WebSocket 透传的反向代理
 
 模板会预填站点设置，你可以在保存前自由调整。
 

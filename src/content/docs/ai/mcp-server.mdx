@@ -43,7 +43,7 @@ Access to the MCP server is authenticated via **API tokens** with scope-based pe
 ## MCP Endpoint
 
 ```
-https://your-server.com/api/mcp
+https://your-server.com/api/plugins/mcpserver/mcp
 ```
 
 ## IDE Configuration
@@ -54,7 +54,7 @@ https://your-server.com/api/mcp
 {
   "mcpServers": {
     "webcasa": {
-      "url": "https://your-server.com/api/mcp",
+      "url": "https://your-server.com/api/plugins/mcpserver/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_TOKEN"
       }
@@ -69,7 +69,7 @@ https://your-server.com/api/mcp
 {
   "mcpServers": {
     "webcasa": {
-      "url": "https://your-server.com/api/mcp",
+      "url": "https://your-server.com/api/plugins/mcpserver/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_TOKEN"
       }
@@ -84,7 +84,7 @@ https://your-server.com/api/mcp
 {
   "mcpServers": {
     "webcasa": {
-      "url": "https://your-server.com/api/mcp",
+      "url": "https://your-server.com/api/plugins/mcpserver/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_TOKEN"
       }
@@ -156,9 +156,6 @@ https://your-server.com/api/mcp
 
 ### System Inspection
 - `run_inspection` — run a health inspection with AI-powered analysis
-
-### App Store
-- Search, install, and list installed applications
 
 ### Cron Jobs
 - `list_cron_jobs` — list all scheduled jobs (optional tag filter)

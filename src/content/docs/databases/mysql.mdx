@@ -80,6 +80,8 @@ The built-in **SQL console** lets you execute queries against any instance direc
 - Switch between instances and databases from a dropdown
 - View query execution time and row counts
 
+> The query console is **read-only** — only `SELECT`, `SHOW`, `DESCRIBE`, and `EXPLAIN` statements are allowed.
+>
 > The query console works across all MySQL and MariaDB instances managed by Web.Casa.
 
 ## Advanced Configuration
@@ -89,9 +91,9 @@ Fine-tune instance performance through the **Settings** tab. You can also apply 
 | Parameter | Description | Default (Dev) |
 |-----------|-------------|---------------|
 | **InnoDB Buffer Pool Size** | Memory allocated to InnoDB caching | 128 MB |
-| **Max Connections** | Maximum simultaneous client connections | 151 |
+| **Max Connections** | Maximum simultaneous client connections | 50 |
 | **Character Set** | Default character set for new databases | `utf8mb4` |
-| **Collation** | Default collation for string comparisons | `utf8mb4_general_ci` |
-| **Slow Query Log** | Log queries exceeding a time threshold | Disabled |
+| **Collation** | Default collation for string comparisons | `utf8mb4_unicode_ci` |
+| **Slow Query Log** | Log queries exceeding a time threshold | Enabled |
 
 > **Production preset** increases buffer pool size and max connections for higher throughput. **Development preset** uses conservative resource limits suitable for local work.

@@ -63,19 +63,21 @@ Web.Casa supports three authentication methods for private repositories:
 
 ## Framework Detection
 
-After cloning, Web.Casa automatically analyzes the repository and detects the framework. **9 frameworks** are currently supported:
+After cloning, Web.Casa automatically analyzes the repository and detects the framework. **11 frameworks** are currently supported:
 
 | Framework | Detection Method |
 |-----------|-----------------|
 | **Next.js** | `next` in `package.json` dependencies |
 | **Nuxt** | `nuxt` in `package.json` dependencies |
 | **Vite** | `vite` in `package.json` devDependencies |
-| **Create React App** | `react-scripts` in dependencies |
-| **Astro** | `astro` in `package.json` dependencies |
-| **Django** | `manage.py` and `requirements.txt` |
-| **Flask** | `flask` in `requirements.txt` |
-| **FastAPI** | `fastapi` in `requirements.txt` |
+| **Remix** | `remix` in `package.json` dependencies |
+| **Express.js** | `express` in `package.json` dependencies |
 | **Go** | `go.mod` in project root |
+| **Laravel** | `laravel/framework` in `composer.json` |
+| **Flask** | `flask` in `requirements.txt` |
+| **Django** | `manage.py` and `requirements.txt` |
+| **Dockerfile** | `Dockerfile` in project root |
+| **Custom** | Manual configuration |
 
 Based on the detected framework, Web.Casa automatically suggests:
 

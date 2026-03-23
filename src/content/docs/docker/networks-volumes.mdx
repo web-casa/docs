@@ -3,6 +3,8 @@ title: Networks & Volumes
 description: Manage Docker networks and volumes for container communication and persistent storage
 ---
 
+> **Note:** Networks and volumes management is now embedded within the **Docker Overview** page rather than being a standalone page. The information below describes all available network and volume management capabilities accessible from the Docker Overview.
+
 Networks and volumes are foundational building blocks for Docker deployments. Web.Casa provides dedicated management interfaces for creating, inspecting, and removing both.
 
 ---
@@ -84,7 +86,6 @@ The volume dashboard shows all Docker volumes with:
 |--------|-------------|
 | **View Mountpoint** | See the host filesystem path where data is stored |
 | **Delete** | Remove the volume and its data |
-| **Prune** | Remove **all volumes** not currently attached to any container |
 
 > **Warning:** Deleting a volume permanently destroys its data. Always verify a volume is no longer needed before deletion. Consider backing up important data first.
 

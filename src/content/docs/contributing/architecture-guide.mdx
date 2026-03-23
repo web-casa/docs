@@ -19,7 +19,8 @@ webcasa/
 │   ├── caddy/               # Caddy process management + Caddyfile rendering
 │   ├── service/             # Business logic layer
 │   ├── handler/             # HTTP request handlers
-│   └── plugins/             # Feature plugins (12 built-in)
+│   └── notify/              # Notification system (Webhook, Email, Discord, Telegram)
+├── plugins/                     # Feature plugins (12 built-in)
 └── web/                     # React 19 frontend
     └── src/
         └── pages/           # Page components
@@ -100,12 +101,12 @@ Web.Casa uses **GORM** with SQLite (WAL mode):
 
 ## Plugin System
 
-Plugins live under `internal/plugins/`. Each plugin implements the **Plugin interface**:
+Plugins live under `plugins/` (at the project root). Each plugin implements the **Plugin interface**:
 
-- **`Init()`** -- register routes, event handlers, and database tables through the CoreAPI
+- **`Metadata()`** -- return plugin metadata (name, version, description, dependencies)
+- **`Init()`** -- register routes, event handlers, and database tables through the plugin Context
 - **`Start()`** -- start background tasks
 - **`Stop()`** -- clean up resources
-- **`Info()`** -- return plugin metadata
 
 See [Plugin System](/plugins/plugin-system/) and [Developing Plugins](/plugins/developing/) for details.
 

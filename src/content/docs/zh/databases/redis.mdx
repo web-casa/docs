@@ -40,10 +40,12 @@ Web.Casa 通过 Docker 容器提供 **Redis** 的完整生命周期管理。从�
 
 内置的 **命令控制台** 支持直接在浏览器中对任意 Redis 实例执行命令：
 
-- 执行任意 Redis 命令（`GET`、`SET`、`HGETALL`、`KEYS` 等）
+- 执行只读 Redis 命令（`GET`、`KEYS`、`INFO`、`TTL`、`TYPE`、`EXISTS`、`DBSIZE`、`MGET`、`HGETALL`、`LRANGE`、`SCARD`、`SMEMBERS`、`ZRANGE`）
 - 以格式化方式查看所有数据类型的响应
 - 通过下拉菜单切换实例
 
+> 命令控制台为**只读模式** — 仅允许上述列出的命令。`SET` 等写入命令会被阻止。
+>
 > 命令控制台适用于 Web.Casa 管理的所有 Redis 实例。
 
 ## 日志

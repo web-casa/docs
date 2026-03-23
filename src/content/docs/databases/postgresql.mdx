@@ -80,6 +80,8 @@ The built-in **SQL console** lets you execute queries against any PostgreSQL ins
 - Switch between instances and databases from a dropdown
 - View query execution time and row counts
 
+> The query console is **read-only** — only `SELECT`, `SHOW`, `DESCRIBE`, and `EXPLAIN` statements are allowed.
+>
 > The query console works across all PostgreSQL instances managed by Web.Casa.
 
 ## Advanced Configuration
@@ -88,11 +90,11 @@ Fine-tune instance performance through the **Settings** tab. You can also apply 
 
 | Parameter | Description | Default (Dev) |
 |-----------|-------------|---------------|
-| **Shared Buffers** | Memory for caching data blocks | 128 MB |
-| **Work Mem** | Memory per query operation (sort, hash) | 4 MB |
-| **Effective Cache Size** | Planner's estimate of OS disk cache available | 512 MB |
+| **Shared Buffers** | Memory for caching data blocks | 64 MB |
+| **Work Mem** | Memory per query operation (sort, hash) | 2 MB |
+| **Effective Cache Size** | Planner's estimate of OS disk cache available | 192 MB |
 | **WAL Level** | Write-Ahead Log detail level (`minimal`, `replica`, `logical`) | `replica` |
-| **Slow Query Threshold** | Log queries exceeding this duration | Disabled |
+| **Slow Query Threshold** | Log queries exceeding this duration | 2000 ms |
 
 > **Production preset** increases shared buffers, work memory, and effective cache size for higher throughput under concurrent workloads. **Development preset** uses conservative resource limits suitable for local work.
 
@@ -100,7 +102,7 @@ Fine-tune instance performance through the **Settings** tab. You can also apply 
 
 In addition to PostgreSQL instances, Web.Casa includes a built-in **SQLite browser** for inspecting local `.sqlite` / `.db` files:
 
-- **Open** any SQLite file from the server filesystem
+- **Open** SQLite files within the panel data directory (restricted to `.db`, `.sqlite`, `.sqlite3` extensions)
 - **Browse** tables and data in **read-only mode**
 - **View schema** definitions (tables, columns, indexes)
 

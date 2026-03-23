@@ -40,10 +40,12 @@ Each instance provides ready-to-use connection details in multiple formats:
 
 The built-in **command console** lets you execute Redis commands against any instance directly from the browser:
 
-- Run any Redis command (`GET`, `SET`, `HGETALL`, `KEYS`, etc.)
+- Run read-only Redis commands (`GET`, `KEYS`, `INFO`, `TTL`, `TYPE`, `EXISTS`, `DBSIZE`, `MGET`, `HGETALL`, `LRANGE`, `SCARD`, `SMEMBERS`, `ZRANGE`)
 - View formatted responses for all data types
 - Switch between instances from a dropdown
 
+> The command console is **read-only** — only the commands listed above are allowed. Write commands such as `SET` are blocked.
+>
 > The command console works across all Redis instances managed by Web.Casa.
 
 ## Logs

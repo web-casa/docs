@@ -9,10 +9,10 @@ Web.Casa uses a **multi-layered authentication system** combining JWT tokens, Pr
 
 The login process follows these steps:
 
-1. User submits **username and password**
-2. The server issues an **ALTCHA Proof-of-Work (PoW) challenge** that the client must solve
-3. Backend validates credentials against the stored **bcrypt** password hash
-4. If **TOTP 2FA** is enabled, the user must provide a six-digit code from their authenticator app
+1. The client fetches an **ALTCHA Proof-of-Work (PoW) challenge** from the server and solves it automatically
+2. User submits **username, password, and the solved PoW challenge** together
+3. Backend verifies the PoW solution, then validates credentials against the stored **bcrypt** password hash
+4. If **TOTP 2FA** is enabled, the server returns a temporary token; the user then provides a six-digit code from their authenticator app (or a recovery code) in a second request
 5. A signed **JWT token** (HS256 algorithm) is issued upon successful authentication
 6. The token is included as `Authorization: Bearer <token>` in all subsequent API requests
 
@@ -28,7 +28,7 @@ All authenticated API requests require a valid JWT token.
 | **Header** | `Authorization: Bearer <token>` |
 | **Secret** | Configured via `WEBCASA_JWT_SECRET` environment variable |
 
-> **Important:** The `WEBCASA_JWT_SECRET` environment variable is **required**. Set it to a strong, random string in `/etc/webcasa/webcasa.env`.
+> **Note:** If `WEBCASA_JWT_SECRET` is not set, Web.Casa automatically generates a random secret and persists it to `data/.jwt_secret`. You can override this by setting the environment variable explicitly in `/etc/webcasa/webcasa.env`.
 
 ## First-Time Setup
 
@@ -68,6 +68,6 @@ Recovery codes provide a backup method to access your account if your authentica
 
 ## Password Requirements
 
-- Minimum **6 characters**
+- Minimum **8 characters**
 - Passwords are hashed with **bcrypt** before storage
 - Plaintext passwords are never stored or logged

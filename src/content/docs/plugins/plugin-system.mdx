@@ -13,16 +13,16 @@ Web.Casa ships with **12 plugins**:
 |--------|-------------|
 | **Docker** | Container, image, network, and volume management |
 | **Deploy** | Git-based project deployment with build pipelines |
-| **AI** | LLM integration, chat assistant, and MCP server |
+| **AI** | LLM integration and chat assistant |
 | **Database** | MySQL, PostgreSQL, and Redis administration |
 | **Monitoring** | Real-time CPU, memory, disk, network metrics and alerts |
 | **Backup** | Kopia-based backup and restore |
 | **App Store** | One-click Docker app installation from catalog |
 | **File Manager** | Web-based file browsing, editing, and management |
-| **Terminal** | Browser-based shell access via xterm.js |
 | **Firewall** | Firewalld zone, port, service, and rich rule management |
 | **PHP** | PHP-FPM and FrankenPHP runtime management |
-| **Notification** | Discord, Telegram, and webhook notification channels |
+| **MCP Server** | Model Context Protocol server for AI tool integration |
+| **Cron Job** | Scheduled task management |
 
 ## Enabling and Disabling Plugins
 
@@ -60,11 +60,10 @@ All plugins implement a standard interface with lifecycle methods:
 
 | Method | Purpose |
 |--------|---------|
+| **`Metadata()`** | Returns metadata: name, version, description, dependencies |
 | **`Init()`** | Registers routes, event handlers, and database tables at startup |
 | **`Start()`** | Activates background processes (collectors, schedulers, watchers) |
 | **`Stop()`** | Cleanly shuts down when the application stops |
-| **`Info()`** | Returns metadata: name, version, description, dependencies |
-| **`Uninstall()`** | Cleans up resources when the plugin is removed |
 
 ## Event Bus
 

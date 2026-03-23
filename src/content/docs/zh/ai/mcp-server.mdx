@@ -43,7 +43,7 @@ MCP 服务器的访问通过具有**基于范围权限**的 **API Token** 认证
 ## MCP 端点
 
 ```
-https://your-server.com/api/mcp
+https://your-server.com/api/plugins/mcpserver/mcp
 ```
 
 ## IDE 配置
@@ -54,7 +54,7 @@ https://your-server.com/api/mcp
 {
   "mcpServers": {
     "webcasa": {
-      "url": "https://your-server.com/api/mcp",
+      "url": "https://your-server.com/api/plugins/mcpserver/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_TOKEN"
       }
@@ -69,7 +69,7 @@ https://your-server.com/api/mcp
 {
   "mcpServers": {
     "webcasa": {
-      "url": "https://your-server.com/api/mcp",
+      "url": "https://your-server.com/api/plugins/mcpserver/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_TOKEN"
       }
@@ -84,7 +84,7 @@ https://your-server.com/api/mcp
 {
   "mcpServers": {
     "webcasa": {
-      "url": "https://your-server.com/api/mcp",
+      "url": "https://your-server.com/api/plugins/mcpserver/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_TOKEN"
       }
@@ -156,9 +156,6 @@ https://your-server.com/api/mcp
 
 ### 系统巡检
 - `run_inspection` — 运行健康巡检并生成 AI 分析报告
-
-### 应用商店
-- 搜索、安装和列出已安装应用
 
 ### 计划任务
 - `list_cron_jobs` — 列出所有定时任务（可按标签筛选）

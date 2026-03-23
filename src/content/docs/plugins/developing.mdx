@@ -14,10 +14,10 @@ You can extend Web.Casa by developing custom plugins. A plugin is a Go package t
 
 ## Project Structure
 
-Create a directory under `internal/plugins/` with your plugin name:
+Create a directory under `plugins/` (at the project root) with your plugin name:
 
 ```
-internal/plugins/myplugin/
+plugins/myplugin/
   myplugin.go       # Plugin struct and lifecycle methods
   handler.go        # HTTP handlers
   service.go        # Business logic
@@ -30,12 +30,12 @@ Your plugin struct must implement these lifecycle methods:
 
 ```go
 type MyPlugin struct {
-    core *core.API
-    db   *gorm.DB
+    ctx *plugin.Context
+    db  *gorm.DB
 }
 
-func (p *MyPlugin) Info() core.PluginInfo {
-    return core.PluginInfo{
+func (p *MyPlugin) Metadata() plugin.Metadata {
+    return plugin.Metadata{
         Name:         "myplugin",
         Version:      "1.0.0",
         Description:  "My custom plugin",
@@ -43,9 +43,9 @@ func (p *MyPlugin) Info() core.PluginInfo {
     }
 }
 
-func (p *MyPlugin) Init(api *core.API) error {
-    p.core = api
-    p.db = api.GetDB()
+func (p *MyPlugin) Init(ctx *plugin.Context) error {
+    p.ctx = ctx
+    p.db = ctx.DB
     // Auto-migrate database tables
     // Register event subscriptions
     return nil
@@ -60,16 +60,11 @@ func (p *MyPlugin) Stop() error {
     // Clean shutdown
     return nil
 }
-
-func (p *MyPlugin) Uninstall() error {
-    // Remove database tables and clean up
-    return nil
-}
 ```
 
 ## Registering Routes
 
-Routes are registered using the **Gin router group** provided through the CoreAPI. Routes are mounted under `/api/v1/plugins/<plugin-name>/`:
+Routes are registered using the **Gin router group** provided through the CoreAPI. Routes are mounted under `/api/plugins/<plugin-name>/`:
 
 ```go
 func (p *MyPlugin) RegisterRoutes(group *gin.RouterGroup) {
@@ -90,7 +85,7 @@ Authentication and authorization middleware are automatically applied to plugin 
 Notify other plugins when something happens:
 
 ```go
-p.core.EventBus().Publish("myplugin.item.created", map[string]interface{}{
+p.ctx.EventBus.Publish("myplugin.item.created", map[string]interface{}{
     "id":   item.ID,
     "name": item.Name,
 })
@@ -101,7 +96,7 @@ p.core.EventBus().Publish("myplugin.item.created", map[string]interface{}{
 React to events from other plugins or the core system:
 
 ```go
-p.core.EventBus().Subscribe("container.started", func(payload interface{}) {
+p.ctx.EventBus.Subscribe("container.started", func(e plugin.Event) {
     // Handle container start event
 })
 ```
@@ -122,26 +117,24 @@ Use the **ConfigStore** to persist plugin settings without direct database acces
 
 ```go
 // Write a setting
-p.core.ConfigStore().Set("myplugin", "api_url", "https://example.com")
+p.ctx.ConfigStore.Set("myplugin", "api_url", "https://example.com")
 
 // Read a setting
-value := p.core.ConfigStore().Get("myplugin", "api_url")
+value := p.ctx.ConfigStore.Get("myplugin", "api_url")
 ```
 
 Settings stored in the ConfigStore are automatically exposed in the Web.Casa settings UI for user configuration.
 
-## CoreAPI Reference
+## Plugin Context Reference
 
-The CoreAPI provides access to shared system services:
+The plugin Context provides access to shared system services:
 
 | Service | Access Method | Purpose |
 |---------|---------------|---------|
-| **Database** | `api.GetDB()` | GORM database connection |
-| **Event Bus** | `api.EventBus()` | Publish and subscribe to events |
-| **Config Store** | `api.ConfigStore()` | Scoped key-value settings |
-| **WebSocket** | `api.WebSocket()` | Real-time streaming to frontend |
-| **Logger** | `api.Logger()` | Structured logging |
-| **Auth Middleware** | `api.AuthMiddleware()` | Protect routes with authentication |
+| **Database** | `ctx.DB` | GORM database connection |
+| **Event Bus** | `ctx.EventBus` | Publish and subscribe to events |
+| **Config Store** | `ctx.ConfigStore` | Scoped key-value settings |
+| **Logger** | `ctx.Logger` | Structured logging |
 
 ## Registration
 

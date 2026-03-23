@@ -11,12 +11,12 @@ The monitoring dashboard displays the following metrics in real time:
 
 | Metric | Details |
 |--------|---------|
-| **CPU** | Per-core utilization, overall usage percentage, load average |
+| **CPU** | Aggregate CPU utilization, overall usage percentage, load average |
 | **Memory** | Total, used, available, cached; consumption breakdown |
 | **Swap** | Swap usage and availability |
-| **Disk** | Capacity and free space per mount point |
+| **Disk** | Root partition (`/`) usage |
 | **Disk I/O** | Read/write throughput (bytes/sec) |
-| **Network I/O** | Sent/received traffic per interface |
+| **Network I/O** | Aggregate network I/O |
 | **Load Average** | 1-minute, 5-minute, and 15-minute averages |
 
 ## Container Metrics
@@ -25,7 +25,6 @@ For each running **Docker container**, the monitoring plugin collects:
 
 - **CPU usage** per container
 - **Memory consumption** per container
-- **Network I/O** (sent/received) per container
 
 This helps you quickly identify which containers are consuming the most resources.
 
@@ -33,7 +32,7 @@ This helps you quickly identify which containers are consuming the most resource
 
 Metrics are retained and can be viewed over multiple time ranges:
 
-- **1 hour** -- fine-grained, second-level resolution
+- **1 hour** -- fine-grained, minute-level resolution (60-second intervals)
 - **6 hours** -- short-term trend analysis
 - **24 hours** -- daily patterns and peak detection
 - **7 days** -- weekly usage trends
@@ -57,8 +56,8 @@ Set up alert rules to get notified when metrics cross defined thresholds.
 
 Each alert rule consists of:
 
-1. **Metric** -- the metric to watch (CPU, memory, disk, network, load average, swap)
-2. **Operator** -- comparison operator (greater than, less than, equal to)
+1. **Metric** -- the metric to watch (cpu_percent, mem_percent, disk_percent, load_avg_1, load_avg_5, load_avg_15)
+2. **Operator** -- comparison operator (greater than, greater than or equal to, less than, less than or equal to)
 3. **Threshold** -- the value that triggers the alert
 4. **Duration** -- how long the condition must persist before firing (e.g., 5 minutes)
 5. **Cooldown** -- minimum interval between repeated alerts for the same rule
@@ -71,9 +70,10 @@ Alerts can be delivered through:
 
 | Channel | Use Case |
 |---------|----------|
-| **Discord** | Team chat notifications via webhook |
-| **Telegram** | Bot messages to a chat or group |
 | **Webhook** | Custom HTTP endpoint for integration with any system |
+| **Email** | Email notifications to configured recipients |
+| **Discord** | Messages to a Discord channel via webhook |
+| **Telegram** | Messages to a Telegram chat via bot |
 
 ### Alert History
 

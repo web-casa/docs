@@ -2,7 +2,8 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
-  site: 'https://docs.web.casa',
+  site: 'https://web.casa',
+  base: '/docs',
   integrations: [
     starlight({
       title: {
@@ -44,7 +45,7 @@ export default defineConfig({
         // og:image for social sharing
         {
           tag: 'meta',
-          attrs: { property: 'og:image', content: 'https://docs.web.casa/og-image.svg' },
+          attrs: { property: 'og:image', content: 'https://web.casa/docs/og-image.svg' },
         },
         {
           tag: 'meta',
@@ -56,7 +57,7 @@ export default defineConfig({
         },
         {
           tag: 'meta',
-          attrs: { name: 'twitter:image', content: 'https://docs.web.casa/og-image.svg' },
+          attrs: { name: 'twitter:image', content: 'https://web.casa/docs/og-image.svg' },
         },
         // JSON-LD structured data is injected by src/components/Head.astro
         // to support locale-aware name/description.

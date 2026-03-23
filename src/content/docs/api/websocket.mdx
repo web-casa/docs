@@ -1,6 +1,6 @@
 ---
 title: WebSocket API
-description: Real-time terminal sessions, monitoring streams, deploy logs, and container log streaming over WebSocket
+description: Real-time terminal sessions, monitoring streams, and container log streaming over WebSocket
 ---
 
 Web.Casa uses **WebSocket** for features requiring real-time, bidirectional communication. All WebSocket connections authenticate with the same JWT token used for the REST API.
@@ -10,7 +10,7 @@ Web.Casa uses **WebSocket** for features requiring real-time, bidirectional comm
 Pass the JWT token as a **query parameter** when opening a WebSocket connection:
 
 ```
-ws://your-server:39921/ws/terminal?token=<jwt-token>
+ws://your-server:39921/api/plugins/filemanager/terminal/ws?token=<jwt-token>
 ```
 
 > **Important:** WebSocket connections are subject to the same [RBAC](/security/rbac/) permissions as REST API endpoints. Viewer-role tokens cannot access admin-only WebSocket endpoints like the terminal.
@@ -19,7 +19,7 @@ ws://your-server:39921/ws/terminal?token=<jwt-token>
 
 ### Terminal (PTY)
 
-**`/ws/terminal`**
+**`/api/plugins/filemanager/terminal/ws`**
 
 Provides full **PTY access** for web-based terminal sessions, powered by [xterm.js](https://xtermjs.org/) on the frontend.
 
@@ -40,7 +40,7 @@ Provides full **PTY access** for web-based terminal sessions, powered by [xterm.
 
 ### Monitoring (Real-Time Metrics)
 
-**`/ws/monitor`**
+**`/api/plugins/monitoring/metrics/ws`**
 
 Streams system metrics to connected clients in real time.
 
@@ -54,19 +54,9 @@ Streams system metrics to connected clients in real time.
 - Server pushes JSON messages at a regular interval
 - Significantly lower overhead than REST polling
 
-### Deploy (Build Log Streaming)
-
-**`/ws/deploy`**
-
-Streams build and deployment logs in real time during Git-based deployments.
-
-- Client receives log lines as they are produced by the build process
-- Provides live feedback during `git pull`, dependency installation, and build steps
-- Connection closes when the deployment completes or fails
-
 ### Docker (Container Log Streaming)
 
-**`/ws/docker/logs/:id`**
+**`/api/plugins/docker/containers/:id/logs`**
 
 Streams container stdout/stderr in real time, equivalent to `docker logs -f`.
 

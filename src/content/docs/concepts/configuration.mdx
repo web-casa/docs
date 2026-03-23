@@ -22,12 +22,12 @@ The primary configuration file is:
 | `WEBCASA_PORT` | `39921` | Panel listening port |
 | `WEBCASA_DATA_DIR` | `./data` | Data directory for database, certs, and backups |
 | `WEBCASA_DB_PATH` | `data/webcasa.db` | SQLite database file path |
-| `WEBCASA_JWT_SECRET` | -- | **Required.** Secret key for signing JWT authentication tokens |
+| `WEBCASA_JWT_SECRET` | Auto-generated | Secret key for signing JWT authentication tokens. Auto-generated and persisted to `data/.jwt_secret` if not set |
 | `WEBCASA_CADDY_BIN` | `caddy` | Path to the Caddy binary |
 | `WEBCASA_CADDYFILE_PATH` | `data/Caddyfile` | Path for the generated Caddyfile |
 | `WEBCASA_LOG_DIR` | `data/logs` | Directory for log files |
 
-> **Warning:** `WEBCASA_JWT_SECRET` has no default value and **must be set** before starting Web.Casa. Use a strong, random string (32+ characters recommended).
+> **Note:** If `WEBCASA_JWT_SECRET` is not set, Web.Casa automatically generates a random secret and persists it to `data/.jwt_secret`. You can override this by setting the environment variable explicitly with a strong, random string (32+ characters recommended).
 
 ## Configuration Precedence
 

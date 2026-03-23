@@ -19,7 +19,8 @@ webcasa/
 │   ├── caddy/               # Caddy 进程管理 + Caddyfile 渲染
 │   ├── service/             # 业务逻辑层
 │   ├── handler/             # HTTP 请求处理器
-│   └── plugins/             # 功能插件（12 个内置）
+│   └── notify/              # 通知系统（Webhook、Email、Discord、Telegram）
+├── plugins/                     # 功能插件（12 个内置）
 └── web/                     # React 19 前端
     └── src/
         └── pages/           # 页面组件
@@ -100,12 +101,12 @@ Web.Casa 使用 **GORM** 配合 SQLite（WAL 模式）：
 
 ## 插件系统
 
-插件位于 `internal/plugins/` 目录下。每个插件实现 **Plugin 接口**：
+插件位于 `plugins/`（项目根目录）下。每个插件实现 **Plugin 接口**：
 
-- **`Init()`** -- 通过 CoreAPI 注册路由、事件处理器和数据库表
+- **`Metadata()`** -- 返回插件元数据（名称、版本、描述、依赖）
+- **`Init()`** -- 通过插件 Context 注册路由、事件处理器和数据库表
 - **`Start()`** -- 启动后台任务
 - **`Stop()`** -- 清理资源
-- **`Info()`** -- 返回插件元数据
 
 详细信息请参阅[插件系统](/zh/plugins/plugin-system/)和[插件开发](/zh/plugins/developing/)。
 
